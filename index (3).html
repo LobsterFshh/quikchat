@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>quikchat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&display=swap">
+<style>
+:root {
+  --bg: #EEF1F8;
+  --surface: #FFFFFF;
+  --ink: #14172B;
+  --muted: #5A607E;
+  --line: #DCE0EE;
+  --accent: #3D3BF3;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3E3FF;
+  --danger: #C23A2B;
+  --ok: #1F9D6B;
+  --shadow: rgba(20, 23, 43, 0.14);
+  --p0: #FF9DB0;
+  --p1: #FFB85C;
+  --p2: #C9E662;
+  --p3: #55D6BA;
+  --p4: #76C6FF;
+  --p5: #BBA2FF;
+  --p6: #FFD94F;
+  --p7: #FF8272;
+  --avatar-ink: #14172B;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E1120;
+    --surface: #1A1E35;
+    --ink: #ECEEFA;
+    --muted: #9AA0C2;
+    --line: #2B3050;
+    --accent: #8583FF;
+    --accent-ink: #0E1120;
+    --accent-soft: #2A2C5E;
+    --danger: #FF8A7A;
+    --ok: #46D39A;
+    --shadow: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+}
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app { height: 100%; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; min-height: 0; }
+
+/* Header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 10px; }
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.55rem; letter-spacing: -0.025em; line-height: 1; }
+.room-tag { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; max-width: 9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.here { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); min-width: 0; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+.stack { display: flex; align-items: center; }
+.stack .av { width: 26px; height: 26px; font-size: 14px; border: 2px solid var(--bg); margin-left: -8px; }
+.stack .av:first-child { margin-left: 0; }
+.invite { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; font-family: var(--font-display); }
+.me-btn { background: none; border: 0; padding: 0; border-radius: 50%; line-height: 0; }
+.me-btn .av { width: 36px; height: 36px; font-size: 19px; }
+
+.av { width: 32px; height: 32px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 18px; line-height: 1; flex: none; color: var(--avatar-ink); user-select: none; }
+
+.banner { background: var(--accent-soft); color: var(--ink); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 8px; }
+
+/* Feed */
+.feedwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.feed { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: 4px 2px 10px; }
+.note, .empty { margin: auto; text-align: center; color: var(--muted); max-width: 26rem; padding: 24px 12px; }
+.empty svg { display: block; margin: 0 auto 12px; }
+.empty h2 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; color: var(--ink); }
+.empty p { margin: 0; }
+.day { align-self: center; margin: 18px 0 4px; font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+.row { display: flex; align-items: flex-end; gap: 8px; margin-top: 2px; }
+.row.first { margin-top: 12px; }
+.row.me { flex-direction: row-reverse; }
+.spacer { width: 32px; flex: none; }
+.col { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: min(80%, 34rem); }
+.me .col { align-items: flex-end; }
+.meta { display: flex; align-items: baseline; gap: 8px; padding: 0 4px; font-size: 12px; color: var(--muted); }
+.nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--ink); overflow-wrap: anywhere; }
+
+.bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 8px 13px; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; cursor: pointer; text-align: left; }
+.me .bubble { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.bubble a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.them:not(.first) .bubble { border-top-left-radius: 6px; }
+.them:not(.last) .bubble { border-bottom-left-radius: 6px; }
+.me:not(.first) .bubble { border-top-right-radius: 6px; }
+.me:not(.last) .bubble { border-bottom-right-radius: 6px; }
+
+.big { font-size: 2.6rem; line-height: 1.15; padding: 0 4px; cursor: pointer; white-space: pre-wrap; }
+.die { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 8px 16px 8px 14px; cursor: pointer; }
+.die .n { font-family: var(--font-display); font-weight: 800; font-size: 2.1rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.die .what { font-size: 13px; color: var(--muted); }
+
+.tray { display: flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; box-shadow: 0 4px 14px var(--shadow); }
+.tray button { border: 0; background: transparent; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; line-height: 1; }
+.tray button:hover, .tray button[aria-pressed="true"] { background: var(--accent-soft); }
+.tray .del { width: auto; border-radius: 999px; padding: 0 12px; font-size: 13px; color: var(--danger); font-weight: 600; }
+
+.rx { display: flex; flex-wrap: wrap; gap: 4px; }
+.me .rx { justify-content: flex-end; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.chip .c { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+.pop { animation: pop 0.28s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+.jump { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); border: 0; border-radius: 999px; padding: 6px 14px; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 600; box-shadow: 0 4px 14px var(--shadow); }
+
+/* Typing + composer */
+.typing { min-height: 22px; padding: 2px 6px 4px; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: bob 1s infinite ease-in-out; }
+.dots i:nth-child(2) { animation-delay: 0.15s; }
+.dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bob { 0%, 80%, 100% { transform: translateY(0); opacity: 0.5; } 40% { transform: translateY(-3px); opacity: 1; } }
+
+.composer { display: flex; align-items: flex-end; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 6px 6px 6px 18px; }
+.composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.composer textarea { flex: 1; min-width: 0; border: 0; background: transparent; resize: none; outline: none; font-size: 16px; line-height: 1.35; padding: 8px 0; max-height: 120px; }
+.composer textarea::placeholder { color: var(--muted); }
+.send { border: 0; background: var(--accent); color: var(--accent-ink); height: 40px; padding: 0 18px; border-radius: 18px; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+.send:disabled { opacity: 0.4; cursor: default; }
+
+/* Sheets */
+.sheet-wrap { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(8, 10, 24, 0.55); padding: 16px; overflow-y: auto; }
+.sheet-wrap[hidden] { display: none; }
+.sheet { width: 100%; max-width: 400px; max-height: 100%; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 50px var(--shadow); }
+.sheet h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.02em; }
+.sheet .hint { margin: 0; color: var(--muted); }
+.sheet label, .sheet .lbl { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.sheet input, .sheet textarea { width: 100%; font-size: 16px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+.sheet textarea { min-height: 120px; resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.sheet ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; color: var(--ink); }
+.sheet pre { margin: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 12px; line-height: 1.45; overflow: auto; max-height: 170px; }
+.picks { display: flex; flex-wrap: wrap; gap: 6px; }
+.pick { width: 40px; height: 40px; border-radius: 12px; border: 2px solid transparent; background: var(--bg); font-size: 22px; line-height: 1; display: grid; place-items: center; }
+.pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.swatch { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 2px var(--line); }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--accent); }
+.preview { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 12px; background: var(--bg); border-radius: 14px; font-family: var(--font-display); font-weight: 700; }
+.preview span.t { overflow-wrap: anywhere; min-width: 0; }
+.actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.actions button { border-radius: 14px; height: 42px; padding: 0 18px; border: 0; font-family: var(--font-display); font-weight: 700; }
+.actions .go { background: var(--accent); color: var(--accent-ink); }
+.actions .ghost { background: transparent; border: 1px solid var(--line); }
+
+.toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); text-align: center; box-shadow: 0 6px 18px var(--shadow); }
+.toast[hidden] { display: none; }
+[hidden] { display: none !important; }
+
+@media (max-width: 460px) {
+  .here .label, .room-tag { display: none; }
+  .brand h1 { font-size: 1.35rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop, .dots i { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="var(--accent)"/></svg>
+      <h1>quikchat</h1>
+      <span class="room-tag" id="roomTag" hidden></span>
+    </div>
+    <div class="right">
+      <div class="here" id="here"></div>
+      <button class="invite" id="invite" type="button" hidden>Invite</button>
+      <button class="me-btn" id="meBtn" type="button" title="Edit your name and look" aria-label="Edit your name and look" hidden></button>
+    </div>
+  </header>
+  <div class="banner" id="banner" role="status" hidden></div>
+  <div class="feedwrap">
+    <main class="feed" id="feed" aria-live="polite"></main>
+    <button class="jump" id="jump" type="button" hidden>New messages ↓</button>
+  </div>
+  <div class="typing" id="typing" aria-live="polite"></div>
+  <form class="composer" id="composer" autocomplete="off">
+    <label for="msg" hidden>Message</label>
+    <textarea id="msg" rows="1" maxlength="1000" placeholder="Connecting…" disabled></textarea>
+    <button class="send" id="send" type="submit" disabled>Send</button>
+  </form>
+</div>
+
+<!-- Firebase setup (shown until a config is added) -->
+<div class="sheet-wrap" id="setup" hidden>
+  <form class="sheet" id="setupForm" role="dialog" aria-modal="true" aria-labelledby="sh" autocomplete="off">
+    <h2 id="sh">Connect Firebase</h2>
+    <p class="hint">One-time setup, about five minutes. It's free for a friend group.</p>
+    <ol>
+      <li>In the <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer">Firebase console</a>, create a project.</li>
+      <li>Build → Firestore Database → Create database.</li>
+      <li>Build → Authentication → Sign-in method → turn on Anonymous.</li>
+      <li>Project settings → Your apps → Web (&lt;/&gt;) → copy the <code>firebaseConfig</code>.</li>
+      <li>Firestore → Rules → paste the rules below and publish.</li>
+    </ol>
+    <div class="lbl">Firestore rules</div>
+    <pre id="rulesText"></pre>
+    <div class="actions" style="margin-top:0"><button class="ghost" id="copyRules" type="button">Copy rules</button></div>
+    <label for="cfg">Paste your firebaseConfig</label>
+    <textarea id="cfg" spellcheck="false" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  appId: "..."&#10;};'></textarea>
+    <p class="hint">Saved in this browser only. To share the page with friends, paste the same values into FIREBASE_CONFIG near the top of this file's script and send them the file.</p>
+    <div class="actions"><button class="go" type="submit">Connect</button></div>
+  </form>
+</div>
+
+<!-- Room code -->
+<div class="sheet-wrap" id="roomSheet" hidden>
+  <form class="sheet" id="roomForm" role="dialog" aria-modal="true" aria-labelledby="rh" autocomplete="off">
+    <h2 id="rh">Pick a room</h2>
+    <p class="hint">Everyone who enters the same room code lands in the same chat. Make it hard to guess, then share it with your friends.</p>
+    <label for="roomCode">Room code</label>
+    <input id="roomCode" maxlength="40" spellcheck="false" autocapitalize="off">
+    <div class="actions"><button class="go" type="submit">Enter room</button></div>
+  </form>
+</div>
+
+<!-- Profile -->
+<div class="sheet-wrap" id="sheet" hidden>
+  <form class="sheet" id="profile" role="dialog" aria-modal="true" aria-labelledby="ph" autocomplete="off">
+    <h2 id="ph">Welcome to quikchat</h2>
+    <p class="hint">Pick the name and look your friends will see.</p>
+    <label for="nick">Name</label>
+    <input id="nick" maxlength="20" placeholder="Your name">
+    <div class="lbl" id="faceLbl">Face</div>
+    <div class="picks" id="faces" role="group" aria-labelledby="faceLbl"></div>
+    <div class="lbl" id="colorLbl">Color</div>
+    <div class="picks" id="swatches" role="group" aria-labelledby="colorLbl"></div>
+    <div class="preview" id="pv"></div>
+    <div class="actions">
+      <button class="ghost" id="cancel" type="button" hidden>Cancel</button>
+      <button class="go" id="save" type="submit">Join the chat</button>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script type="module">
+/*
+  QUIKCHAT — group chat on Firebase (Firestore + anonymous sign-in).
+
+  Paste your Firebase web config below (Project settings → Your apps → Web),
+  or leave it empty and paste it into the in-page setup screen instead.
+  Web config values are not secrets; the Firestore rules are what protect your data.
+
+  Firestore rules to publish:
+
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /rooms/{room}/members/{uid} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null && request.auth.uid == uid;
+        }
+        match /rooms/{room}/presence/{uid} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null && request.auth.uid == uid;
+        }
+        match /rooms/{room}/messages/{id} {
+          allow read: if request.auth != null;
+          allow create: if request.auth != null && request.resource.data.by == request.auth.uid;
+          allow update: if request.auth != null
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']);
+          allow delete: if request.auth != null && resource.data.by == request.auth.uid;
+        }
+      }
+    }
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBGcxvuRnPmKHt-Nryd9Q2BqFNnF4rjRuQ",
+  authDomain: "quikchat-5eacd.firebaseapp.com",
+  projectId: "quikchat-5eacd",
+  storageBucket: "quikchat-5eacd.firebasestorage.app",
+  messagingSenderId: "197262186266",
+  appId: "1:197262186266:web:7850e7edc851ff5399bea3"
+};
+
+const RULES = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/{room}/members/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /rooms/{room}/presence/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+    match /rooms/{room}/messages/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.by == request.auth.uid;
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']);
+      allow delete: if request.auth != null && resource.data.by == request.auth.uid;
+    }
+  }
+}`;
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot,
+  query, orderBy, limit, serverTimestamp, FieldPath
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const $ = (id) => document.getElementById(id);
+const FACES = ['🦊', '🐸', '🐙', '🦄', '🐻', '🐼', '🦉', '🐢', '🌵', '🍕', '👾', '🛼'];
+const COLOR_NAMES = ['Pink', 'Orange', 'Lime', 'Teal', 'Sky', 'Violet', 'Yellow', 'Coral'];
+const REACTS = ['👍', '❤️', '😂', '🔥', '😮', '🙌'];
+const GAP = 5 * 60 * 1000;
+const ONLINE_MS = 60 * 1000;
+const TYPING_MS = 6000;
+
+const S = {
+  db: null, uid: null, room: null,
+  members: {}, presence: {}, msgs: [],
+  membersReady: false, msgsReady: false,
+  active: null, pendingDelete: null,
+  seen: new Set(), loaded: false, stick: true,
+  editing: false, askedProfile: false, blocked: false,
+  typingOn: false, typingTimer: null, lastTypingWrite: 0
+};
+const D = { nick: '', face: FACES[0], color: 0 };
+const feed = $('feed'), msg = $('msg'), sendBtn = $('send');
+let toastTimer = null;
+
+/* ---------- helpers ---------- */
+function hashIdx(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h % 8; }
+function member(uid) { return (uid && S.members[uid]) || null; }
+function colorIdx(uid) { const m = member(uid); return (m && Number.isInteger(m.color) && m.color >= 0 && m.color < 8) ? m.color : hashIdx(uid || ''); }
+function faceOf(uid) { const m = member(uid); return (m && typeof m.face === 'string' && FACES.includes(m.face)) ? m.face : '🙂'; }
+function nameOf(uid) { const m = member(uid); return (m && typeof m.nick === 'string' && m.nick.trim()) ? m.nick.trim().slice(0, 20) : 'Someone'; }
+function dayKey(ts) { const d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+function timeLabel(ts) { return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+function dayLabel(ts) {
+  const now = Date.now();
+  if (dayKey(ts) === dayKey(now)) return 'Today';
+  if (dayKey(ts) === dayKey(now - 86400000)) return 'Yesterday';
+  return new Date(ts).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function av(uid) {
+  const a = el('span', 'av', faceOf(uid));
+  a.style.background = 'var(--p' + colorIdx(uid) + ')';
+  a.setAttribute('aria-hidden', 'true');
+  return a;
+}
+function toast(t) {
+  const n = $('toast'); n.textContent = t; n.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { n.hidden = true; }, 3200);
+}
+function banner(t) { const b = $('banner'); if (t) { b.textContent = t; b.hidden = false; } else { b.hidden = true; } }
+function hasProfile() { return !!(S.uid && member(S.uid)); }
+function canPost() { return !!(S.db && S.uid && !S.blocked && hasProfile()); }
+function fillText(node, text) {
+  const re = /(https?:\/\/[^\s<>]+)/g;
+  let last = 0, m;
+  while ((m = re.exec(text))) {
+    let url = m[1], trail = '';
+    const t = url.match(/[.,!?;:)\]]+$/);
+    if (t) { trail = t[0]; url = url.slice(0, -trail.length); }
+    if (m.index > last) node.appendChild(document.createTextNode(text.slice(last, m.index)));
+    if (url.length > 8) {
+      const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = url; node.appendChild(a);
+    } else { node.appendChild(document.createTextNode(url)); }
+    if (trail) node.appendChild(document.createTextNode(trail));
+    last = m.index + m[1].length;
+  }
+  if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
+}
+function emojiOnly(t) {
+  return t.length <= 30 && /\p{Extended_Pictographic}/u.test(t) && /^(?:\p{Extended_Pictographic}|\p{Emoji_Modifier}|‍|️|\s)+$/u.test(t);
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+  return Promise.reject(new Error('no clipboard'));
+}
+
+/* ---------- Firebase paths ---------- */
+const col = (name) => collection(S.db, 'rooms', S.room, name);
+const ref = (name, id) => doc(S.db, 'rooms', S.room, name, id);
+
+/* ---------- feed ---------- */
+function emptyState() {
+  const d = el('div', 'empty');
+  d.innerHTML = '<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="var(--accent)"/></svg>';
+  d.appendChild(el('h2', null, 'Nothing here yet'));
+  d.appendChild(el('p', null, 'Messages from you and your friends show up here. Type below to say hi, or try /roll and /flip.'));
+  return d;
+}
+function reactionCount(m, e) {
+  const o = m.reactions && m.reactions[e];
+  if (!o || typeof o !== 'object') return 0;
+  let n = 0; for (const k in o) if (o[k] === true) n++;
+  return n;
+}
+function reactedByMe(m, e) { return !!(S.uid && m.reactions && m.reactions[e] && m.reactions[e][S.uid] === true); }
+
+function bubbleFor(m) {
+  if (m.kind === 'roll' && Number.isFinite(m.result) && Number.isFinite(m.sides)) {
+    const d = el('div', 'die'); d.appendChild(el('span', 'n', String(m.result))); d.appendChild(el('span', 'what', 'rolled a d' + m.sides)); return d;
+  }
+  if (m.kind === 'flip' && (m.result === 'Heads' || m.result === 'Tails')) {
+    const f = el('div', 'die'); f.appendChild(el('span', 'n', m.result)); f.appendChild(el('span', 'what', 'flipped a coin')); return f;
+  }
+  const text = typeof m.text === 'string' ? m.text : '';
+  if (emojiOnly(text)) return el('div', 'big', text);
+  const b = el('div', 'bubble'); fillText(b, text); return b;
+}
+
+function rowFor(m, first, last) {
+  const mine = m.by === S.uid;
+  const fresh = S.loaded && !S.seen.has(m.id);
+  const r = el('div', 'row ' + (mine ? 'me' : 'them') + (first ? ' first' : '') + (last ? ' last' : '') + (fresh ? ' pop' : ''));
+  if (!mine) r.appendChild(last ? av(m.by) : el('span', 'spacer'));
+  const col = el('div', 'col');
+  if (first) {
+    const meta = el('div', 'meta');
+    if (!mine) meta.appendChild(el('span', 'nm', nameOf(m.by)));
+    meta.appendChild(el('span', null, timeLabel(m.ts)));
+    col.appendChild(meta);
+  }
+  const b = bubbleFor(m);
+  if (canPost()) {
+    b.setAttribute('role', 'button'); b.tabIndex = 0;
+    b.setAttribute('aria-expanded', S.active === m.id ? 'true' : 'false');
+    const toggle = (e) => {
+      if (e.target.closest && e.target.closest('a')) return;
+      S.active = S.active === m.id ? null : m.id; S.pendingDelete = null; render();
+    };
+    b.addEventListener('click', toggle);
+    b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } });
+  }
+  col.appendChild(b);
+  if (S.active === m.id && canPost()) {
+    const tray = el('div', 'tray');
+    REACTS.forEach((em) => {
+      const rb = el('button', null, em); rb.type = 'button';
+      rb.setAttribute('aria-pressed', reactedByMe(m, em) ? 'true' : 'false');
+      rb.setAttribute('aria-label', 'React ' + em);
+      rb.addEventListener('click', () => { S.active = null; toggleReaction(m, em); render(); });
+      tray.appendChild(rb);
+    });
+    if (mine) {
+      const del = el('button', 'del', S.pendingDelete === m.id ? 'Sure?' : 'Delete'); del.type = 'button';
+      del.addEventListener('click', () => {
+        if (S.pendingDelete === m.id) { S.active = null; S.pendingDelete = null; deleteMsg(m); render(); }
+        else { S.pendingDelete = m.id; render(); }
+      });
+      tray.appendChild(del);
+    }
+    col.appendChild(tray);
+  }
+  const chips = REACTS.filter((e) => reactionCount(m, e) > 0);
+  if (chips.length) {
+    const rx = el('div', 'rx');
+    chips.forEach((e) => {
+      const c = el('button', 'chip'); c.type = 'button';
+      c.setAttribute('aria-pressed', reactedByMe(m, e) ? 'true' : 'false');
+      c.appendChild(document.createTextNode(e));
+      c.appendChild(el('span', 'c', String(reactionCount(m, e))));
+      if (canPost()) c.addEventListener('click', () => toggleReaction(m, e)); else c.disabled = true;
+      rx.appendChild(c);
+    });
+    col.appendChild(rx);
+  }
+  r.appendChild(col);
+  return r;
+}
+
+function render() {
+  const near = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
+  const st = feed.scrollTop;
+  const frag = document.createDocumentFragment();
+  if (!S.msgsReady) {
+    frag.appendChild(el('div', 'note', 'Connecting to the chat…'));
+  } else if (!S.msgs.length) {
+    frag.appendChild(emptyState());
+  } else {
+    let prev = null;
+    S.msgs.forEach((m, i) => {
+      const next = S.msgs[i + 1];
+      const newDay = !prev || dayKey(prev.ts) !== dayKey(m.ts);
+      if (newDay) frag.appendChild(el('div', 'day', dayLabel(m.ts)));
+      const first = newDay || prev.by !== m.by || m.ts - prev.ts > GAP;
+      const last = !next || next.by !== m.by || next.ts - m.ts > GAP || dayKey(next.ts) !== dayKey(m.ts);
+      frag.appendChild(rowFor(m, first, last));
+      prev = m;
+    });
+  }
+  feed.replaceChildren(frag);
+  const added = S.msgs.filter((m) => !S.seen.has(m.id));
+  const mineNew = added.some((m) => m.by === S.uid);
+  if (S.stick || near || mineNew || (!S.loaded && S.msgsReady)) {
+    feed.scrollTop = feed.scrollHeight; S.stick = false; $('jump').hidden = true;
+  } else {
+    feed.scrollTop = st;
+    if (added.length) $('jump').hidden = false;
+  }
+  if (S.msgsReady) { S.msgs.forEach((m) => S.seen.add(m.id)); S.loaded = true; }
+}
+
+/* ---------- header, typing, composer ---------- */
+function onlineIds() {
+  const now = Date.now();
+  const ids = Object.keys(S.presence).filter((id) => {
+    const p = S.presence[id]; return p && Number.isFinite(p.seen) && now - p.seen < ONLINE_MS;
+  });
+  if (S.uid && !ids.includes(S.uid)) ids.unshift(S.uid);
+  return ids;
+}
+function renderHere() {
+  const here = $('here'); here.replaceChildren();
+  const ids = S.uid ? onlineIds() : [];
+  if (ids.length) {
+    here.appendChild(el('span', 'dot'));
+    const stack = el('span', 'stack');
+    ids.slice(0, 4).forEach((id) => { const a = av(id); a.title = nameOf(id); stack.appendChild(a); });
+    here.appendChild(stack);
+    here.appendChild(el('span', 'label', ids.length === 1 ? 'Just you here' : ids.length + ' here now'));
+  } else {
+    const n = Object.keys(S.members).length;
+    if (n) here.appendChild(el('span', 'label', n + (n === 1 ? ' friend' : ' friends')));
+  }
+  const mb = $('meBtn');
+  if (hasProfile()) { mb.hidden = false; mb.replaceChildren(av(S.uid)); } else { mb.hidden = true; }
+}
+function renderTyping() {
+  const t = $('typing'); t.replaceChildren();
+  const now = Date.now(); const names = [];
+  Object.keys(S.presence).forEach((id) => {
+    const p = S.presence[id];
+    if (id === S.uid || !p || p.typing !== true || !Number.isFinite(p.typingAt) || now - p.typingAt > TYPING_MS) return;
+    const n = nameOf(id); if (!names.includes(n)) names.push(n);
+  });
+  if (!names.length) return;
+  const dots = el('span', 'dots'); dots.innerHTML = '<i></i><i></i><i></i>';
+  t.appendChild(dots);
+  t.appendChild(el('span', null, names.length === 1 ? names[0] + ' is typing' : names.length === 2 ? names[0] + ' and ' + names[1] + ' are typing' : 'Several people are typing'));
+}
+function syncComposer() {
+  const ok = canPost();
+  msg.disabled = !ok; sendBtn.disabled = !ok || !msg.value.trim();
+  if (S.blocked) msg.placeholder = 'Chat is blocked, see the note above';
+  else if (!S.db || !S.uid) msg.placeholder = 'Connecting…';
+  else if (!hasProfile()) msg.placeholder = S.membersReady ? 'Pick a name to start chatting' : 'Connecting…';
+  else msg.placeholder = 'Message your friends… try /roll or /flip';
+}
+function autosize() { msg.style.height = 'auto'; msg.style.height = Math.min(msg.scrollHeight, 120) + 'px'; }
+
+function writePresence(patch) {
+  if (!S.db || !S.uid) return Promise.resolve();
+  return setDoc(ref('presence', S.uid), patch, { merge: true }).catch(() => {});
+}
+function onType() {
+  if (!msg.value.trim()) { stopTyping(); return; }
+  const now = Date.now();
+  if (!S.typingOn || now - S.lastTypingWrite > 2500) {
+    S.typingOn = true; S.lastTypingWrite = now;
+    writePresence({ typing: true, typingAt: now, seen: now });
+  }
+  clearTimeout(S.typingTimer); S.typingTimer = setTimeout(stopTyping, 4000);
+}
+function stopTyping() {
+  clearTimeout(S.typingTimer);
+  if (S.typingOn) { S.typingOn = false; writePresence({ typing: false, seen: Date.now() }); }
+}
+
+/* ---------- writes ---------- */
+function explain(e) {
+  const code = e && e.code ? String(e.code) : '';
+  if (code.includes('permission-denied')) return 'Firebase refused the request. Check that the Firestore rules at the top of this file are published.';
+  if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') return 'Turn on Anonymous sign-in in Firebase Authentication, then reload.';
+  if (code.includes('api-key') || code === 'auth/invalid-api-key') return 'The Firebase API key looks wrong. Check the config you pasted.';
+  if (code.includes('failed-precondition') || code.includes('not-found')) return 'Firestore isn’t set up for this project yet. Create the database in the Firebase console.';
+  return '';
+}
+function writeError(e, ctx, restore) {
+  const why = explain(e);
+  if (ctx === 'react') { toast('Reaction didn’t go through.'); return; }
+  if (why) banner(why);
+  toast('Couldn’t send. Check your connection and try again.');
+  if (restore && !msg.value) { msg.value = restore; autosize(); syncComposer(); }
+}
+async function send() {
+  const text = msg.value.trim();
+  if (!text || !canPost()) return;
+  const doc_ = { by: S.uid, ts: serverTimestamp(), reactions: {} };
+  const cmd = text.match(/^\/(roll|flip)(?:\s+d?(\d{1,4}))?$/i);
+  if (cmd && cmd[1].toLowerCase() === 'flip') {
+    doc_.kind = 'flip'; doc_.result = Math.random() < 0.5 ? 'Heads' : 'Tails';
+  } else if (cmd) {
+    const sides = Math.min(1000, Math.max(2, parseInt(cmd[2] || '6', 10)));
+    doc_.kind = 'roll'; doc_.sides = sides; doc_.result = 1 + Math.floor(Math.random() * sides);
+  } else {
+    doc_.kind = 'text'; doc_.text = text.slice(0, 1000);
+  }
+  msg.value = ''; autosize(); stopTyping(); syncComposer(); S.stick = true; S.active = null;
+  try { await addDoc(col('messages'), doc_); }
+  catch (e) { writeError(e, 'send', text); }
+}
+let rxChain = Promise.resolve();
+function toggleReaction(m, emoji) {
+  const mine = reactedByMe(m, emoji);
+  rxChain = rxChain
+    .then(() => updateDoc(ref('messages', m.id), new FieldPath('reactions', emoji, S.uid), !mine))
+    .catch((e) => writeError(e, 'react'));
+}
+function deleteMsg(m) {
+  deleteDoc(ref('messages', m.id)).catch(() => toast('Couldn’t delete that message.'));
+}
+
+/* ---------- profile sheet ---------- */
+function renderPicks() {
+  const f = $('faces'); f.replaceChildren();
+  FACES.forEach((face) => {
+    const b = el('button', 'pick', face); b.type = 'button';
+    b.setAttribute('aria-pressed', D.face === face ? 'true' : 'false');
+    b.setAttribute('aria-label', 'Face ' + face);
+    b.addEventListener('click', () => { D.face = face; renderPicks(); });
+    f.appendChild(b);
+  });
+  const s = $('swatches'); s.replaceChildren();
+  COLOR_NAMES.forEach((name, i) => {
+    const b = el('button', 'swatch'); b.type = 'button';
+    b.style.background = 'var(--p' + i + ')';
+    b.setAttribute('aria-pressed', D.color === i ? 'true' : 'false');
+    b.setAttribute('aria-label', name);
+    b.addEventListener('click', () => { D.color = i; renderPicks(); });
+    s.appendChild(b);
+  });
+  const pv = $('pv'); pv.replaceChildren();
+  const a = el('span', 'av', D.face); a.style.background = 'var(--p' + D.color + ')'; a.setAttribute('aria-hidden', 'true');
+  pv.appendChild(a); pv.appendChild(el('span', 't', $('nick').value.trim() || 'Your name'));
+}
+function openSheet(editing) {
+  const m = member(S.uid);
+  S.editing = editing;
+  D.nick = (m && typeof m.nick === 'string' && m.nick) || '';
+  D.face = (m && FACES.includes(m.face)) ? m.face : FACES[Math.floor(Math.random() * FACES.length)];
+  D.color = (m && Number.isInteger(m.color) && m.color >= 0 && m.color < 8) ? m.color : hashIdx(S.uid || '');
+  $('nick').value = D.nick.slice(0, 20);
+  $('cancel').hidden = !editing;
+  $('ph').textContent = editing ? 'Your look' : 'Welcome to quikchat';
+  $('save').textContent = editing ? 'Save' : 'Join the chat';
+  renderPicks();
+  $('sheet').hidden = false;
+  $('nick').focus();
+}
+function closeSheet() { $('sheet').hidden = true; (hasProfile() ? msg : $('meBtn')).focus(); }
+$('nick').addEventListener('input', renderPicks);
+$('cancel').addEventListener('click', closeSheet);
+$('profile').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nick = $('nick').value.trim().slice(0, 20);
+  if (!nick) { $('nick').focus(); toast('Add a name first.'); return; }
+  if (!S.db || !S.uid) return;
+  try {
+    await setDoc(ref('members', S.uid), { nick, face: D.face, color: D.color });
+    closeSheet();
+  } catch (err) {
+    toast('Couldn’t save. Try again.');
+    const why = explain(err); if (why) banner(why);
+  }
+});
+$('sheet').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && S.editing) { closeSheet(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...$('profile').querySelectorAll('button, input')].filter((n) => !n.hidden && !n.disabled);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+$('meBtn').addEventListener('click', () => openSheet(true));
+
+/* ---------- wiring ---------- */
+$('composer').addEventListener('submit', (e) => { e.preventDefault(); send(); });
+msg.addEventListener('input', () => { autosize(); syncComposer(); onType(); });
+msg.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
+});
+msg.addEventListener('blur', stopTyping);
+$('jump').addEventListener('click', () => { feed.scrollTop = feed.scrollHeight; $('jump').hidden = true; });
+feed.addEventListener('scroll', () => {
+  if (feed.scrollHeight - feed.scrollTop - feed.clientHeight < 60) $('jump').hidden = true;
+});
+$('invite').addEventListener('click', async () => {
+  const url = location.href.split('#')[0] + '#' + S.room;
+  try { await copyText(url); toast('Invite link copied. Room code: ' + S.room); }
+  catch (e) { toast('Room code: ' + S.room); }
+});
+
+/* ---------- config + room ---------- */
+function parseConfig(text) {
+  const out = {}; const re = /["']?(\w+)["']?\s*:\s*["']([^"']*)["']/g; let m;
+  while ((m = re.exec(text))) out[m[1]] = m[2];
+  return (out.apiKey && out.projectId && out.appId) ? out : null;
+}
+function loadConfig() {
+  if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.appId) return FIREBASE_CONFIG;
+  try { const saved = JSON.parse(localStorage.getItem('stoop.cfg') || 'null'); if (saved && saved.apiKey && saved.projectId && saved.appId) return saved; } catch (e) {}
+  return null;
+}
+function showSetup() {
+  $('rulesText').textContent = RULES;
+  $('setup').hidden = false;
+  $('cfg').focus();
+  msg.placeholder = 'Connect Firebase to start';
+}
+$('copyRules').addEventListener('click', async () => {
+  try { await copyText(RULES); toast('Rules copied.'); }
+  catch (e) { const r = document.createRange(); r.selectNodeContents($('rulesText')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Press copy on the selected text.'); }
+});
+$('setupForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const cfg = parseConfig($('cfg').value);
+  if (!cfg) { toast('Couldn’t find apiKey, projectId and appId in that text.'); return; }
+  try { localStorage.setItem('stoop.cfg', JSON.stringify(cfg)); } catch (err) { toast('This browser blocked saving. Paste the config into the file instead.'); return; }
+  location.reload();
+});
+
+function validRoom(r) { return /^[a-z0-9][a-z0-9-]{2,39}$/.test(r); }
+function randomRoom() {
+  const a = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = 'quik-';
+  const buf = new Uint32Array(6); crypto.getRandomValues(buf);
+  buf.forEach((n) => { s += a[n % a.length]; });
+  return s;
+}
+function askRoom() {
+  return new Promise((resolve) => {
+    const input = $('roomCode');
+    input.value = randomRoom();
+    $('roomSheet').hidden = false; input.focus(); input.select();
+    $('roomForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const r = input.value.trim().toLowerCase();
+      if (!validRoom(r)) { toast('Use 3 to 40 letters, numbers or dashes.'); return; }
+      $('roomSheet').hidden = true; resolve(r);
+    });
+  });
+}
+async function pickRoom() {
+  let r = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
+  if (!validRoom(r)) { try { r = localStorage.getItem('stoop.room') || ''; } catch (e) { r = ''; } }
+  if (!validRoom(r)) r = await askRoom();
+  try { localStorage.setItem('stoop.room', r); } catch (e) {}
+  history.replaceState(null, '', location.href.split('#')[0] + '#' + r);
+  return r;
+}
+window.addEventListener('hashchange', () => {
+  const r = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
+  if (validRoom(r) && r !== S.room) { try { localStorage.setItem('stoop.room', r); } catch (e) {} location.reload(); }
+});
+
+function onSubErr(e) {
+  S.msgsReady = true;
+  const why = explain(e);
+  banner(why || 'Lost the connection to the chat. Reload the page to reconnect.');
+  syncComposer(); render();
+}
+
+/* ---------- start ---------- */
+async function init() {
+  render(); syncComposer();
+  const cfg = loadConfig();
+  if (!cfg) { S.msgsReady = true; render(); showSetup(); return; }
+  S.room = await pickRoom();
+  $('roomTag').textContent = S.room; $('roomTag').hidden = false; $('invite').hidden = false;
+
+  let app, auth;
+  try {
+    app = initializeApp(cfg);
+    auth = getAuth(app);
+    S.db = getFirestore(app);
+    const cred = await signInAnonymously(auth);
+    S.uid = cred.user.uid;
+  } catch (e) {
+    S.msgsReady = true;
+    banner(explain(e) || 'Couldn’t connect to Firebase. Check your config and your internet connection.');
+    syncComposer(); render(); return;
+  }
+
+  onSnapshot(col('members'), (snap) => {
+    const m = {};
+    snap.forEach((d) => { m[d.id] = d.data(); });
+    S.members = m; S.membersReady = true;
+    if (S.uid && !m[S.uid] && !S.askedProfile) { S.askedProfile = true; openSheet(false); }
+    renderHere(); renderTyping(); syncComposer(); render();
+  }, onSubErr);
+
+  onSnapshot(query(col('messages'), orderBy('ts', 'desc'), limit(300)), (snap) => {
+    S.msgs = snap.docs.map((d) => {
+      const v = d.data({ serverTimestamps: 'estimate' });
+      const ts = v.ts && typeof v.ts.toMillis === 'function' ? v.ts.toMillis() : Date.now();
+      return { id: d.id, by: v.by, ts, kind: v.kind, text: v.text, result: v.result, sides: v.sides, reactions: v.reactions || {} };
+    }).reverse();
+    S.msgsReady = true; syncComposer(); render();
+  }, onSubErr);
+
+  onSnapshot(col('presence'), (snap) => {
+    const p = {};
+    snap.forEach((d) => { p[d.id] = d.data(); });
+    S.presence = p; renderHere(); renderTyping();
+  }, () => {});
+
+  const beat = () => writePresence({ seen: Date.now() });
+  beat(); setInterval(beat, 20000);
+  setInterval(() => { renderHere(); renderTyping(); }, 3000);
+  addEventListener('pagehide', () => { writePresence({ seen: 0, typing: false }); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(); });
+  renderHere();
+}
+init();
+</script>
+</body>
+</html>
