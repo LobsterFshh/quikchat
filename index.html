@@ -21,6 +21,7 @@
   --danger: #C23A2B;
   --ok: #1F9D6B;
   --shadow: rgba(20, 23, 43, 0.14);
+  --scrim: rgba(8, 10, 24, 0.55);
   --p0: #FF9DB0;
   --p1: #FFB85C;
   --p2: #C9E662;
@@ -47,6 +48,7 @@
     --danger: #FF8A7A;
     --ok: #46D39A;
     --shadow: rgba(0, 0, 0, 0.5);
+    --scrim: rgba(0, 0, 0, 0.6);
     color-scheme: dark;
   }
 }
@@ -68,21 +70,29 @@ body {
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
 
 .app { height: 100%; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; min-height: 0; }
 
 /* Header */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 10px; }
-.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.55rem; letter-spacing: -0.025em; line-height: 1; }
-.room-tag { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; max-width: 9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.right { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.here { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); min-width: 0; }
+.lead { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+.icon-btn { position: relative; flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; padding: 0; }
+.icon-btn svg { display: block; }
+.badge { position: absolute; top: 5px; right: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+.room-btn { display: flex; align-items: center; gap: 6px; min-width: 0; background: none; border: 0; padding: 4px 6px; border-radius: 10px; font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.02em; line-height: 1.1; text-align: left; }
+.room-btn:hover { background: var(--surface); }
+.room-btn:disabled { cursor: default; background: none; }
+.room-btn .rn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.room-btn svg { flex: none; color: var(--muted); }
+.right { display: flex; align-items: center; gap: 10px; min-width: 0; flex: none; }
+.here { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); min-width: 0; background: none; border: 0; padding: 4px 6px; border-radius: 12px; }
+.here:hover { background: var(--surface); }
+.here:disabled { cursor: default; background: none; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
 .stack { display: flex; align-items: center; }
 .stack .av { width: 26px; height: 26px; font-size: 14px; border: 2px solid var(--bg); margin-left: -8px; }
 .stack .av:first-child { margin-left: 0; }
-.invite { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; font-family: var(--font-display); }
 .me-btn { background: none; border: 0; padding: 0; border-radius: 50%; line-height: 0; }
 .me-btn .av { width: 36px; height: 36px; font-size: 19px; }
 
@@ -120,6 +130,27 @@ button { cursor: pointer; }
 .die { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 8px 16px 8px 14px; cursor: pointer; }
 .die .n { font-family: var(--font-display); font-weight: 800; font-size: 2.1rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
 .die .what { font-size: 13px; color: var(--muted); }
+.fun { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 9px 16px 9px 14px; cursor: pointer; max-width: 100%; text-align: left; }
+.fun .ic { flex: none; font-size: 2rem; line-height: 1; }
+.fun .tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fun .what { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.fun .res { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; line-height: 1.2; color: var(--accent); overflow-wrap: anywhere; }
+.fun .res.big { font-size: 1.9rem; letter-spacing: 0.08em; }
+.fun .sub { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.emote { font-style: italic; color: var(--muted); padding: 2px 4px; cursor: pointer; overflow-wrap: anywhere; text-align: left; }
+
+/* Command popup */
+.cmdmenu { position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); z-index: 30; display: flex; flex-direction: column; max-height: min(46vh, 340px); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 30px var(--shadow); overflow: hidden; }
+.cm-head { flex: none; padding: 10px 14px 6px; font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.cm-list { overflow-y: auto; overscroll-behavior: contain; padding: 0 6px 6px; display: flex; flex-direction: column; gap: 2px; }
+.cm-item { display: flex; align-items: center; gap: 12px; padding: 7px 8px; border-radius: 12px; cursor: pointer; }
+.cm-item[aria-selected="true"] { background: var(--accent-soft); }
+.cm-ic { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; font-size: 18px; line-height: 1; }
+.cm-item[aria-selected="true"] .cm-ic { background: var(--surface); }
+.cm-tx { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; min-width: 0; }
+.cm-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+.cm-args { margin-left: 5px; font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--muted); }
+.cm-desc { font-size: 13px; color: var(--muted); }
 
 .tray { display: flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; box-shadow: 0 4px 14px var(--shadow); }
 .tray button { border: 0; background: transparent; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; line-height: 1; }
@@ -145,16 +176,51 @@ button { cursor: pointer; }
 .dots i:nth-child(3) { animation-delay: 0.3s; }
 @keyframes bob { 0%, 80%, 100% { transform: translateY(0); opacity: 0.5; } 40% { transform: translateY(-3px); opacity: 1; } }
 
-.composer { display: flex; align-items: flex-end; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 6px 6px 6px 18px; }
+.composer { position: relative; display: flex; align-items: flex-end; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 6px 6px 6px 6px; }
 .composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .composer textarea { flex: 1; min-width: 0; border: 0; background: transparent; resize: none; outline: none; font-size: 16px; line-height: 1.35; padding: 8px 0; max-height: 120px; }
 .composer textarea::placeholder { color: var(--muted); }
 .send { border: 0; background: var(--accent); color: var(--accent-ink); height: 40px; padding: 0 18px; border-radius: 18px; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
 .send:disabled { opacity: 0.4; cursor: default; }
 
+/* Rooms drawer */
+.scrim { position: fixed; inset: 0; z-index: 40; background: var(--scrim); opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0s 0.2s; }
+.scrim.open { opacity: 1; visibility: visible; transition: opacity 0.2s ease; }
+.drawer {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 41;
+  width: min(340px, 88vw);
+  background: var(--surface); border-right: 1px solid var(--line);
+  box-shadow: 8px 0 30px var(--shadow);
+  display: flex; flex-direction: column; gap: 12px; min-height: 0;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: 16px;
+  transform: translateX(-102%); visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s 0.22s;
+}
+.drawer.open { transform: none; visibility: visible; transition: transform 0.22s ease; }
+.drawer-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.025em; line-height: 1; }
+.join-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 44px; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+.list-lbl { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 4px 4px 0; }
+.rooms { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; margin-right: -6px; padding-right: 6px; }
+.room-item { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 14px; padding: 8px 10px; }
+.room-item:hover { background: var(--bg); }
+.room-item[aria-current="true"] { background: var(--accent-soft); }
+.r-av { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 19px; color: var(--avatar-ink); text-transform: uppercase; }
+.r-txt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.r-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.r-prev { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.r-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.r-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.room-item.unread .r-name { font-weight: 800; }
+.room-item.unread .r-prev { color: var(--ink); font-weight: 600; }
+.room-item.unread .r-meta { color: var(--accent); font-weight: 700; }
+
 /* Sheets */
-.sheet-wrap { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(8, 10, 24, 0.55); padding: 16px; overflow-y: auto; }
-.sheet-wrap[hidden] { display: none; }
+.sheet-wrap { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--scrim); padding: 16px; overflow-y: auto; }
 .sheet { width: 100%; max-width: 400px; max-height: 100%; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 50px var(--shadow); }
 .sheet h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.02em; }
 .sheet .hint { margin: 0; color: var(--muted); }
@@ -163,6 +229,9 @@ button { cursor: pointer; }
 .sheet textarea { min-height: 120px; resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
 .sheet ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; color: var(--ink); }
 .sheet pre { margin: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 12px; line-height: 1.45; overflow: auto; max-height: 170px; }
+.codebox { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 6px 6px 6px 12px; }
+.codebox code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; overflow-wrap: anywhere; min-width: 0; }
+.codebox button { flex: none; height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-display); font-weight: 700; font-size: 13px; }
 .picks { display: flex; flex-wrap: wrap; gap: 6px; }
 .pick { width: 40px; height: 40px; border-radius: 12px; border: 2px solid transparent; background: var(--bg); font-size: 22px; line-height: 1; display: grid; place-items: center; }
 .pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
@@ -174,17 +243,66 @@ button { cursor: pointer; }
 .actions button { border-radius: 14px; height: 42px; padding: 0 18px; border: 0; font-family: var(--font-display); font-weight: 700; }
 .actions .go { background: var(--accent); color: var(--accent-ink); }
 .actions .ghost { background: transparent; border: 1px solid var(--line); }
+.actions .danger { color: var(--danger); margin-right: auto; }
 
-.toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); text-align: center; box-shadow: 0 6px 18px var(--shadow); }
-.toast[hidden] { display: none; }
-[hidden] { display: none !important; }
+/* Files */
+.attach { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; padding: 0; }
+.attach:hover { background: var(--accent-soft); color: var(--ink); }
+.attach:disabled { opacity: 0.4; cursor: default; background: transparent; color: var(--muted); }
+.uploads { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+.up { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
+.up-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar { display: block; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.fill { display: block; height: 100%; background: var(--accent); transition: width 0.2s ease; }
+.filecard { position: relative; width: min(280px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.fc-main { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 46px 10px 10px; background: none; border: 0; text-align: left; color: inherit; }
+.fc-main:hover { background: var(--bg); }
+.fc-main.hasthumb { flex-direction: column; align-items: stretch; gap: 0; padding: 0; }
+.fc-thumb { display: block; width: 100%; max-height: 220px; object-fit: cover; background: var(--bg); }
+.fc-ic { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 12px; letter-spacing: 0.02em; color: var(--avatar-ink); }
+.fc-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.fc-main.hasthumb .fc-txt { padding: 8px 46px 10px 12px; }
+.fc-name { font-family: var(--font-display); font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-meta { font-size: 12px; color: var(--muted); }
+.fc-more { position: absolute; right: 6px; bottom: 6px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); display: grid; place-items: center; padding: 0; }
+.fc-main:not(.hasthumb) + .fc-more { top: 50%; bottom: auto; transform: translateY(-50%); }
+.pv-sheet { max-width: 720px; }
+.pv-sheet h2 { overflow-wrap: anywhere; }
+.pv-body { background: var(--bg); border-radius: 14px; padding: 8px; min-height: 140px; max-height: min(60vh, 560px); overflow: auto; display: grid; place-items: center; }
+.pv-body.text { display: block; }
+.pv-body img { max-width: 100%; max-height: min(56vh, 520px); object-fit: contain; border-radius: 8px; }
+.pv-body iframe { width: 100%; height: min(56vh, 520px); border: 0; background: #fff; border-radius: 8px; }
+.pv-body audio, .pv-body video { width: 100%; max-height: min(56vh, 520px); }
+.pv-body pre { margin: 0; width: 100%; background: transparent; border: 0; padding: 6px; max-height: none; overflow: visible; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pv-generic { display: grid; justify-items: center; gap: 8px; padding: 20px; text-align: center; }
+.pv-generic .fc-ic { width: 64px; height: 64px; font-size: 16px; border-radius: 16px; }
+.drop { position: fixed; inset: 10px; z-index: 55; display: grid; place-items: center; border: 3px dashed var(--accent); border-radius: 24px; background: var(--scrim); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; text-align: center; padding: 20px; pointer-events: none; }
+.tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: 1px; }
+.pbtn { margin-left: auto; flex: none; height: 32px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+.pbtn.danger { color: var(--danger); }
+.adm { margin-top: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+.adm summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--muted); }
+.adm .hint { margin: 8px 0; }
+.people { display: flex; flex-direction: column; gap: 4px; }
+.person { display: flex; align-items: center; gap: 12px; padding: 6px 4px; min-width: 0; }
+.pav { position: relative; flex: none; line-height: 0; }
+.pav .av { width: 44px; height: 44px; font-size: 24px; }
+.pdot { position: absolute; right: -1px; bottom: -1px; width: 13px; height: 13px; border-radius: 50%; background: var(--ok); border: 3px solid var(--surface); }
+.pdot.alt { background: var(--surface); box-shadow: inset 0 0 0 2px var(--ok); }
+.ptxt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.pname { font-family: var(--font-display); font-weight: 700; font-size: 15px; overflow-wrap: anywhere; }
+.pname .you { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--muted); }
+.psub { font-size: 13px; color: var(--muted); }
+.person.away .av { opacity: 0.55; }
+.toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); text-align: center; box-shadow: 0 6px 18px var(--shadow); }
 
 @media (max-width: 460px) {
-  .here .label, .room-tag { display: none; }
-  .brand h1 { font-size: 1.35rem; }
+  .here .label { display: none; }
+  .room-btn { font-size: 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pop, .dots i { animation: none; }
+  .drawer, .drawer.open, .scrim, .scrim.open { transition: none; }
 }
 </style>
 </head>
@@ -192,14 +310,18 @@ button { cursor: pointer; }
 
 <div class="app">
   <header class="top">
-    <div class="brand">
-      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="var(--accent)"/></svg>
-      <h1>quikchat</h1>
-      <span class="room-tag" id="roomTag" hidden></span>
+    <div class="lead">
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Open your rooms" aria-expanded="false" aria-controls="drawer">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="badge" id="menuBadge" hidden></span>
+      </button>
+      <button class="room-btn" id="roomBtn" type="button" title="Room settings" aria-label="Room settings" disabled>
+        <span class="rn" id="roomName">quikchat</span>
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
     </div>
     <div class="right">
-      <div class="here" id="here"></div>
-      <button class="invite" id="invite" type="button" hidden>Invite</button>
+      <button class="here" id="here" type="button" aria-label="See who's in this room" hidden></button>
       <button class="me-btn" id="meBtn" type="button" title="Edit your name and look" aria-label="Edit your name and look" hidden></button>
     </div>
   </header>
@@ -208,15 +330,41 @@ button { cursor: pointer; }
     <main class="feed" id="feed" aria-live="polite"></main>
     <button class="jump" id="jump" type="button" hidden>New messages ↓</button>
   </div>
+  <div class="uploads" id="uploads" aria-live="polite" hidden></div>
   <div class="typing" id="typing" aria-live="polite"></div>
   <form class="composer" id="composer" autocomplete="off">
+    <div class="cmdmenu" id="cmdMenu" hidden></div>
+    <button class="attach" id="attachBtn" type="button" aria-label="Share a file" title="Share a file" disabled>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M20 11.5l-7.6 7.6a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.6-7.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <input type="file" id="fileInput" multiple hidden>
     <label for="msg" hidden>Message</label>
     <textarea id="msg" rows="1" maxlength="1000" placeholder="Connecting…" disabled></textarea>
     <button class="send" id="send" type="submit" disabled>Send</button>
   </form>
 </div>
 
-<!-- Firebase setup (shown until a config is added) -->
+<!-- Rooms drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Your rooms" inert>
+  <div class="drawer-top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="var(--accent)"/></svg>
+      <h1>quikchat</h1>
+    </div>
+    <button class="icon-btn" id="closeDrawer" type="button" aria-label="Close rooms">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <button class="join-btn" id="joinBtn" type="button">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    Join room
+  </button>
+  <div class="list-lbl" id="listLbl">Your rooms</div>
+  <nav class="rooms" id="roomList" aria-labelledby="listLbl"></nav>
+</aside>
+
+<!-- Firebase setup (shown only when no config is present) -->
 <div class="sheet-wrap" id="setup" hidden>
   <form class="sheet" id="setupForm" role="dialog" aria-modal="true" aria-labelledby="sh" autocomplete="off">
     <h2 id="sh">Connect Firebase</h2>
@@ -238,15 +386,62 @@ button { cursor: pointer; }
   </form>
 </div>
 
-<!-- Room code -->
+<!-- Join room -->
 <div class="sheet-wrap" id="roomSheet" hidden>
   <form class="sheet" id="roomForm" role="dialog" aria-modal="true" aria-labelledby="rh" autocomplete="off">
-    <h2 id="rh">Pick a room</h2>
-    <p class="hint">Everyone who enters the same room code lands in the same chat. Make it hard to guess, then share it with your friends.</p>
+    <h2 id="rh">Join a room</h2>
+    <p class="hint">Enter the room code a friend gave you, or make a new room and share its code.</p>
     <label for="roomCode">Room code</label>
-    <input id="roomCode" maxlength="40" spellcheck="false" autocapitalize="off">
-    <div class="actions"><button class="go" type="submit">Enter room</button></div>
+    <input id="roomCode" maxlength="40" spellcheck="false" autocapitalize="off" placeholder="quik-abc123">
+    <div class="actions">
+      <button class="ghost" id="roomCancel" type="button" hidden>Cancel</button>
+      <button class="ghost" id="roomRandom" type="button">New room</button>
+      <button class="go" type="submit">Join</button>
+    </div>
   </form>
+</div>
+
+<!-- Room settings -->
+<div class="sheet-wrap" id="roomInfo" hidden>
+  <form class="sheet" id="roomInfoForm" role="dialog" aria-modal="true" aria-labelledby="rih" autocomplete="off">
+    <h2 id="rih">Room settings</h2>
+    <label for="roomNameInput">Room name</label>
+    <input id="roomNameInput" maxlength="30">
+    <p class="hint">Anyone in this room can change the name.</p>
+    <div class="lbl">Room code</div>
+    <div class="codebox"><code id="codeText"></code><button type="button" id="copyInvite">Copy invite</button></div>
+    <p class="hint">Friends can join with this code. Leaving only removes the room from your list. You can rejoin any time with the code.</p>
+    <div class="actions">
+      <button class="ghost danger" id="leaveBtn" type="button">Leave room</button>
+      <button class="ghost" id="roomInfoCancel" type="button">Cancel</button>
+      <button class="go" type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- File preview -->
+<div class="sheet-wrap" id="previewSheet" hidden>
+  <div class="sheet pv-sheet" role="dialog" aria-modal="true" aria-labelledby="pvt">
+    <h2 id="pvt">File</h2>
+    <p class="hint" id="pvMeta"></p>
+    <div class="pv-body" id="pvBody"></div>
+    <p class="hint" id="pvNote" hidden></p>
+    <div class="actions">
+      <button class="ghost" id="pvClose" type="button">Close</button>
+      <button class="go" id="pvDownload" type="button" disabled>Download</button>
+    </div>
+  </div>
+</div>
+<div class="drop" id="dropHint" hidden>Drop to share in this room</div>
+
+<!-- People in this room -->
+<div class="sheet-wrap" id="peopleSheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pph">
+    <h2 id="pph">People</h2>
+    <p class="hint" id="peopleSub"></p>
+    <div class="people" id="peopleList"></div>
+    <div class="actions"><button class="go" id="peopleClose" type="button">Done</button></div>
+  </div>
 </div>
 
 <!-- Profile -->
@@ -261,6 +456,11 @@ button { cursor: pointer; }
     <div class="lbl" id="colorLbl">Color</div>
     <div class="picks" id="swatches" role="group" aria-labelledby="colorLbl"></div>
     <div class="preview" id="pv"></div>
+    <details class="adm">
+      <summary>Admin</summary>
+      <p class="hint" id="admText"></p>
+      <div class="codebox"><code id="myId"></code><button type="button" id="copyId">Copy ID</button></div>
+    </details>
     <div class="actions">
       <button class="ghost" id="cancel" type="button" hidden>Cancel</button>
       <button class="go" id="save" type="submit">Join the chat</button>
@@ -271,34 +471,13 @@ button { cursor: pointer; }
 
 <script type="module">
 /*
-  QUIKCHAT — group chat on Firebase (Firestore + anonymous sign-in).
+  QUIKCHAT — group chat with multiple rooms, on Firebase (Firestore + anonymous sign-in).
 
   Paste your Firebase web config below (Project settings → Your apps → Web),
   or leave it empty and paste it into the in-page setup screen instead.
   Web config values are not secrets; the Firestore rules are what protect your data.
 
-  Firestore rules to publish:
-
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /rooms/{room}/members/{uid} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null && request.auth.uid == uid;
-        }
-        match /rooms/{room}/presence/{uid} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null && request.auth.uid == uid;
-        }
-        match /rooms/{room}/messages/{id} {
-          allow read: if request.auth != null;
-          allow create: if request.auth != null && request.resource.data.by == request.auth.uid;
-          allow update: if request.auth != null
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']);
-          allow delete: if request.auth != null && resource.data.by == request.auth.uid;
-        }
-      }
-    }
+  The Firestore rules to publish are in the RULES constant just below.
 */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBGcxvuRnPmKHt-Nryd9Q2BqFNnF4rjRuQ",
@@ -312,20 +491,54 @@ const FIREBASE_CONFIG = {
 const RULES = `rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function notBanned(room) {
+      return signedIn() && !exists(/databases/$(database)/documents/rooms/$(room)/banned/$(request.auth.uid));
+    }
+
+    match /admins/{uid} {
+      allow read: if signedIn();
+    }
+    match /rooms/{room} {
+      allow read: if signedIn();
+      allow create, update: if notBanned(room)
+        && request.resource.data.keys().hasOnly(['name'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 30;
+    }
+    match /rooms/{room}/banned/{uid} {
+      allow read: if signedIn();
+      allow create, delete: if isAdmin();
+    }
     match /rooms/{room}/members/{uid} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow read: if notBanned(room);
+      allow create, update: if signedIn() && request.auth.uid == uid && notBanned(room)
+        && (request.resource.data.nick.lower() != 'scuba' || isAdmin());
+      allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
     }
     match /rooms/{room}/presence/{uid} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow read: if notBanned(room);
+      allow write: if signedIn() && request.auth.uid == uid && notBanned(room);
+      allow delete: if isAdmin();
+    }
+    match /rooms/{room}/filechunks/{id} {
+      allow read: if notBanned(room);
+      allow create: if notBanned(room)
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.keys().hasOnly(['by', 'fileId', 'i', 'data'])
+        && request.resource.data.data.size() <= 800000;
+      allow delete: if signedIn() && (resource.data.by == request.auth.uid || isAdmin());
     }
     match /rooms/{room}/messages/{id} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.by == request.auth.uid;
-      allow update: if request.auth != null
+      allow read: if notBanned(room);
+      allow create: if notBanned(room) && request.resource.data.by == request.auth.uid;
+      allow update: if notBanned(room)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']);
-      allow delete: if request.auth != null && resource.data.by == request.auth.uid;
+      allow delete: if signedIn() && (resource.data.by == request.auth.uid || isAdmin());
     }
   }
 }`;
@@ -333,8 +546,8 @@ service cloud.firestore {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot,
-  query, orderBy, limit, serverTimestamp, FieldPath
+  getFirestore, collection, doc, addDoc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot,
+  query, orderBy, limit, serverTimestamp, FieldPath, Bytes
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const $ = (id) => document.getElementById(id);
@@ -342,17 +555,34 @@ const FACES = ['🦊', '🐸', '🐙', '🦄', '🐻', '🐼', '🦉', '🐢', '
 const COLOR_NAMES = ['Pink', 'Orange', 'Lime', 'Teal', 'Sky', 'Violet', 'Yellow', 'Coral'];
 const REACTS = ['👍', '❤️', '😂', '🔥', '😮', '🙌'];
 const GAP = 5 * 60 * 1000;
-const ONLINE_MS = 60 * 1000;
+const ONLINE_MS = 90 * 1000;
 const TYPING_MS = 6000;
+const MAX_ROOMS = 40;
+
+/* ---------- storage ---------- */
+const LS = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  json(k, fallback) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? fallback : v; } catch (e) { return fallback; } }
+};
+function validRoom(r) { return typeof r === 'string' && /^[a-z0-9][a-z0-9-]{2,39}$/.test(r); }
 
 const S = {
   db: null, uid: null, room: null,
+  rooms: [],            // [{code, at}] rooms this browser has joined
+  info: {},             // code -> {name, last}
+  infoSubs: {},         // code -> [unsub, unsub]
+  readTs: LS.json('quikchat.read', {}),
+  subs: [],             // active-room listeners
   members: {}, presence: {}, msgs: [],
   membersReady: false, msgsReady: false,
-  active: null, pendingDelete: null,
+  active: null, pendingDelete: null, pendingLeave: false,
   seen: new Set(), loaded: false, stick: true,
-  editing: false, askedProfile: false, blocked: false,
-  typingOn: false, typingTimer: null, lastTypingWrite: 0
+  editing: false, askedProfile: false,
+  typingOn: false, typingTimer: null, lastTypingWrite: 0,
+  drawerOpen: false,
+  uploads: [], fileCache: new Map(), pv: null, pvToken: 0,
+  admins: new Set(), isAdmin: false, banned: {}, bannedSelf: false, pendingKick: null
 };
 const D = { nick: '', face: FACES[0], color: 0 };
 const feed = $('feed'), msg = $('msg'), sendBtn = $('send');
@@ -372,6 +602,12 @@ function dayLabel(ts) {
   if (dayKey(ts) === dayKey(now - 86400000)) return 'Yesterday';
   return new Date(ts).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 }
+function shortTime(ts) {
+  const now = Date.now();
+  if (dayKey(ts) === dayKey(now)) return timeLabel(ts);
+  if (dayKey(ts) === dayKey(now - 86400000)) return 'Yesterday';
+  return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function av(uid) {
   const a = el('span', 'av', faceOf(uid));
@@ -385,7 +621,7 @@ function toast(t) {
 }
 function banner(t) { const b = $('banner'); if (t) { b.textContent = t; b.hidden = false; } else { b.hidden = true; } }
 function hasProfile() { return !!(S.uid && member(S.uid)); }
-function canPost() { return !!(S.db && S.uid && !S.blocked && hasProfile()); }
+function canPost() { return !!(S.db && S.uid && S.room && hasProfile() && !S.bannedSelf); }
 function fillText(node, text) {
   const re = /(https?:\/\/[^\s<>]+)/g;
   let last = 0, m;
@@ -409,17 +645,278 @@ function copyText(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
   return Promise.reject(new Error('no clipboard'));
 }
+function randomRoom() {
+  const a = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = 'quik-';
+  const buf = new Uint32Array(6); crypto.getRandomValues(buf);
+  buf.forEach((n) => { s += a[n % a.length]; });
+  return s;
+}
+function roomLabel(code) { const i = S.info[code]; return (i && i.name) ? i.name : code; }
 
 /* ---------- Firebase paths ---------- */
 const col = (name) => collection(S.db, 'rooms', S.room, name);
 const ref = (name, id) => doc(S.db, 'rooms', S.room, name, id);
 
+function msgFrom(d) {
+  const v = d.data({ serverTimestamps: 'estimate' });
+  const ts = v.ts && typeof v.ts.toMillis === 'function' ? v.ts.toMillis() : Date.now();
+  return { id: d.id, by: v.by, ts, kind: v.kind, text: v.text, result: v.result, icon: v.icon, sub: v.sub, sides: v.sides, file: v.file, reactions: v.reactions || {} };
+}
+
+/* ---------- sheets ---------- */
+const sheets = {};
+function showSheet(id, focusId, dismiss) {
+  sheets[id] = { dismiss, prev: document.activeElement };
+  $(id).hidden = false;
+  if (focusId) $(focusId).focus();
+}
+function hideSheet(id, restore = true) {
+  $(id).hidden = true;
+  const p = sheets[id] && sheets[id].prev;
+  delete sheets[id];
+  if (restore && p && p.focus && document.contains(p)) p.focus();
+}
+function anySheetOpen() { return Object.keys(sheets).length > 0; }
+['setup', 'roomSheet', 'roomInfo', 'peopleSheet', 'previewSheet', 'sheet'].forEach((id) => {
+  $(id).addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const s = sheets[id];
+      if (s && s.dismiss) { e.stopPropagation(); s.dismiss(); }
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const f = [...$(id).querySelectorAll('button, input, textarea, a[href]')].filter((n) => !n.hidden && !n.disabled && n.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+});
+
+/* ---------- rooms list (drawer) ---------- */
+function saveRooms() { LS.set('quikchat.rooms', JSON.stringify(S.rooms)); }
+function saveRead() { LS.set('quikchat.read', JSON.stringify(S.readTs)); }
+function markRead(code, ts) {
+  if (!code) return;
+  const t = Math.max(ts || 0, Date.now());
+  if (t > (S.readTs[code] || 0)) { S.readTs[code] = t; saveRead(); }
+}
+function isUnread(code) {
+  if (code === S.room && !document.hidden) return false;
+  const i = S.info[code];
+  return !!(i && i.last && i.last.by !== S.uid && i.last.ts > (S.readTs[code] || 0));
+}
+function previewText(m) {
+  let t = '';
+  if (m.kind === 'roll') t = '🎲 rolled a d' + m.sides + ': ' + m.result;
+  else if (m.kind === 'flip') t = '🪙 flipped ' + m.result;
+  else if (m.kind === 'fun') t = (typeof m.icon === 'string' && m.icon ? m.icon : '✨') + ' ' + (typeof m.result === 'string' ? m.result : '');
+  else if (m.kind === 'me') t = '🎭 ' + (typeof m.text === 'string' ? m.text : '');
+  else if (m.kind === 'file') t = '📎 ' + (m.file && typeof m.file.name === 'string' ? m.file.name : 'File');
+  else t = typeof m.text === 'string' ? m.text.replace(/\s+/g, ' ') : '';
+  return (m.by === S.uid ? 'You: ' : '') + t;
+}
+function renderRooms() {
+  const list = $('roomList'); list.replaceChildren();
+  const sorted = S.rooms.slice().sort((a, b) => {
+    const ta = (S.info[a.code] && S.info[a.code].last && S.info[a.code].last.ts) || a.at;
+    const tb = (S.info[b.code] && S.info[b.code].last && S.info[b.code].last.ts) || b.at;
+    return tb - ta;
+  });
+  if (!sorted.length) { list.appendChild(el('p', 'note', 'No rooms yet. Tap Join room to start.')); }
+  sorted.forEach((r) => {
+    const i = S.info[r.code] || {};
+    const unread = isUnread(r.code);
+    const b = el('button', 'room-item' + (unread ? ' unread' : ''));
+    b.type = 'button';
+    if (r.code === S.room) b.setAttribute('aria-current', 'true');
+    const a = el('span', 'r-av', (roomLabel(r.code).trim()[0] || '#'));
+    a.style.background = 'var(--p' + hashIdx(r.code) + ')';
+    a.setAttribute('aria-hidden', 'true');
+    const txt = el('span', 'r-txt');
+    txt.appendChild(el('span', 'r-name', roomLabel(r.code)));
+    txt.appendChild(el('span', 'r-prev', i.last ? previewText(i.last) : 'No messages yet'));
+    const meta = el('span', 'r-meta');
+    if (i.last) meta.appendChild(el('span', null, shortTime(i.last.ts)));
+    if (unread) { const d = el('span', 'r-dot'); d.setAttribute('aria-label', 'Unread messages'); meta.appendChild(d); }
+    b.append(a, txt, meta);
+    b.addEventListener('click', () => { closeDrawer(false); switchRoom(r.code); msg.focus(); });
+    list.appendChild(b);
+  });
+  $('menuBadge').hidden = !S.rooms.some((r) => r.code !== S.room && isUnread(r.code));
+}
+function openDrawer() {
+  S.drawerOpen = true;
+  renderRooms();
+  $('drawer').inert = false;
+  $('drawer').classList.add('open'); $('scrim').classList.add('open');
+  $('menuBtn').setAttribute('aria-expanded', 'true');
+  $('joinBtn').focus();
+}
+function closeDrawer(returnFocus = true) {
+  if (!S.drawerOpen) return;
+  S.drawerOpen = false;
+  $('drawer').classList.remove('open'); $('scrim').classList.remove('open');
+  $('drawer').inert = true;
+  $('menuBtn').setAttribute('aria-expanded', 'false');
+  if (returnFocus) $('menuBtn').focus();
+}
+$('menuBtn').addEventListener('click', () => (S.drawerOpen ? closeDrawer() : openDrawer()));
+$('closeDrawer').addEventListener('click', () => closeDrawer());
+$('scrim').addEventListener('click', () => closeDrawer());
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && S.drawerOpen && !anySheetOpen()) closeDrawer();
+});
+
+function subscribeInfo(code) {
+  if (!S.db || S.infoSubs[code]) return;
+  const u1 = onSnapshot(doc(S.db, 'rooms', code), (snap) => {
+    const v = snap.exists() ? snap.data() : null;
+    S.info[code] = Object.assign({}, S.info[code], { name: v && typeof v.name === 'string' ? v.name.slice(0, 30) : '' });
+    renderRooms(); if (code === S.room) updateHeader();
+  }, () => {});
+  const u2 = onSnapshot(query(collection(S.db, 'rooms', code, 'messages'), orderBy('ts', 'desc'), limit(1)), (snap) => {
+    const d = snap.docs[0];
+    S.info[code] = Object.assign({}, S.info[code], { last: d ? msgFrom(d) : null });
+    renderRooms();
+  }, () => {});
+  S.infoSubs[code] = [u1, u2];
+}
+function unsubscribeInfo(code) {
+  (S.infoSubs[code] || []).forEach((u) => u());
+  delete S.infoSubs[code]; delete S.info[code];
+}
+function addRoom(code) {
+  if (!S.rooms.some((r) => r.code === code)) {
+    if (S.rooms.length >= MAX_ROOMS) { toast('You can keep up to ' + MAX_ROOMS + ' rooms. Leave one first.'); return false; }
+    S.rooms.push({ code, at: Date.now() });
+    if (!S.readTs[code]) { S.readTs[code] = Date.now(); saveRead(); }
+    saveRooms();
+  }
+  subscribeInfo(code);
+  return true;
+}
+function updateHeader() {
+  const label = S.room ? roomLabel(S.room) : 'quikchat';
+  $('roomName').textContent = label;
+  $('roomBtn').disabled = !S.room;
+  document.title = S.room ? label + ' · quikchat' : 'quikchat';
+}
+
+/* ---------- room lifecycle ---------- */
+function writePresence(patch) {
+  if (!S.db || !S.uid || !S.room) return Promise.resolve();
+  return setDoc(ref('presence', S.uid), patch, { merge: true }).catch(() => {});
+}
+function writeAllPresence(patch) {
+  if (!S.db || !S.uid) return;
+  S.rooms.forEach((r) => {
+    setDoc(doc(S.db, 'rooms', r.code, 'presence', S.uid), patch, { merge: true }).catch(() => {});
+  });
+}
+function beatAll() {
+  writeAllPresence({ vis: true, seen: Date.now(), view: S.room || null });
+}
+function stopRoom() {
+  stopTyping();
+  if (S.room && S.db && S.uid) writePresence({ typing: false });
+  if (sheets.peopleSheet) hideSheet('peopleSheet', false);
+  if (sheets.previewSheet) closePreview(false);
+  S.subs.forEach((u) => u()); S.subs = [];
+  S.members = {}; S.presence = {}; S.msgs = [];
+  S.membersReady = false; S.msgsReady = false;
+  S.seen = new Set(); S.loaded = false; S.stick = true;
+  S.active = null; S.pendingDelete = null; S.askedProfile = false;
+  S.banned = {}; S.bannedSelf = false; S.pendingKick = null;
+  $('jump').hidden = true;
+  banner('');
+}
+function switchRoom(code) {
+  if (!validRoom(code)) return;
+  if (code === S.room && S.subs.length) return;
+  stopRoom();
+  S.room = code;
+  LS.set('quikchat.last', code);
+  history.replaceState(null, '', location.href.split('#')[0] + '#' + code);
+  updateHeader(); renderHere(); renderTyping(); syncComposer(); render(); renderRooms();
+  startRoom();
+}
+function restartRoom() {
+  const c = S.room;
+  if (!c) return;
+  stopRoom(); S.room = null; switchRoom(c);
+}
+function noRoom() {
+  stopRoom();
+  S.room = null; LS.set('quikchat.last', '');
+  history.replaceState(null, '', location.href.split('#')[0]);
+  S.msgsReady = true;
+  updateHeader(); renderHere(); renderTyping(); syncComposer(); render(); renderRooms();
+}
+function startRoom() {
+  if (!S.db || !S.uid || !S.room) return;
+  const room = S.room;
+  S.subs.push(onSnapshot(col('members'), (snap) => {
+    const m = {};
+    snap.forEach((d) => { m[d.id] = d.data(); });
+    S.members = m; S.membersReady = true;
+    if (S.uid && !m[S.uid] && !S.askedProfile) {
+      S.askedProfile = true;
+      const saved = LS.json('quikchat.profile', null);
+      if (saved && saved.nick && FACES.includes(saved.face)) {
+        setDoc(ref('members', S.uid), { nick: String(saved.nick).slice(0, 20), face: saved.face, color: Number.isInteger(saved.color) ? saved.color : 0 })
+          .catch((e) => { openProfile(false); const why = explain(e); if (why) banner(why); });
+      } else {
+        openProfile(false);
+      }
+    }
+    renderHere(); renderTyping(); syncComposer(); render();
+  }, onSubErr));
+
+  S.subs.push(onSnapshot(query(col('messages'), orderBy('ts', 'desc'), limit(300)), (snap) => {
+    S.msgs = snap.docs.map(msgFrom).reverse();
+    S.msgsReady = true;
+    if (!document.hidden && room === S.room) {
+      const latest = S.msgs.length ? S.msgs[S.msgs.length - 1].ts : 0;
+      markRead(room, latest);
+    }
+    syncComposer(); render(); renderRooms();
+  }, onSubErr));
+
+  S.subs.push(onSnapshot(col('presence'), (snap) => {
+    const p = {};
+    snap.forEach((d) => { p[d.id] = d.data(); });
+    S.presence = p; renderHere(); renderTyping();
+  }, () => {}));
+
+  S.subs.push(onSnapshot(col('banned'), (snap) => {
+    const b = {};
+    snap.forEach((d) => { b[d.id] = d.data(); });
+    const was = S.bannedSelf;
+    S.banned = b; S.bannedSelf = !!(S.uid && b[S.uid]);
+    if (S.bannedSelf) banner('An admin removed you from this room. You can leave it from the room settings.');
+    else if (was) { banner(''); setTimeout(restartRoom, 0); }
+    syncComposer(); renderHere(); render();
+    if (sheets.peopleSheet) renderPeople();
+  }, () => {}));
+
+  beatAll();
+}
+
 /* ---------- feed ---------- */
 function emptyState() {
   const d = el('div', 'empty');
   d.innerHTML = '<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="var(--accent)"/></svg>';
-  d.appendChild(el('h2', null, 'Nothing here yet'));
-  d.appendChild(el('p', null, 'Messages from you and your friends show up here. Type below to say hi, or try /roll and /flip.'));
+  if (S.room && S.bannedSelf) {
+    d.appendChild(el('h2', null, 'You were removed from this room'));
+    d.appendChild(el('p', null, 'An admin removed you, so you can’t see or send messages here.'));
+  } else if (!S.room) {
+    d.appendChild(el('h2', null, 'Pick a room'));
+    d.appendChild(el('p', null, 'Open the menu to switch rooms, or join one with a code.'));
+  } else {
+    d.appendChild(el('h2', null, 'Nothing here yet'));
+    d.appendChild(el('p', null, 'Messages from you and your friends show up here. Type below to say hi, or type / to see fun commands like /roll, /8ball and /slots. Tap any message to react, or to delete your own. Use the paperclip to share a file.'));
+  }
   return d;
 }
 function reactionCount(m, e) {
@@ -431,12 +928,23 @@ function reactionCount(m, e) {
 function reactedByMe(m, e) { return !!(S.uid && m.reactions && m.reactions[e] && m.reactions[e][S.uid] === true); }
 
 function bubbleFor(m) {
+  if (m.kind === 'file') return el('div', 'bubble', 'File unavailable');
   if (m.kind === 'roll' && Number.isFinite(m.result) && Number.isFinite(m.sides)) {
     const d = el('div', 'die'); d.appendChild(el('span', 'n', String(m.result))); d.appendChild(el('span', 'what', 'rolled a d' + m.sides)); return d;
   }
   if (m.kind === 'flip' && (m.result === 'Heads' || m.result === 'Tails')) {
     const f = el('div', 'die'); f.appendChild(el('span', 'n', m.result)); f.appendChild(el('span', 'what', 'flipped a coin')); return f;
   }
+  if (m.kind === 'fun' && typeof m.result === 'string' && m.result) {
+    const f = el('div', 'fun');
+    f.appendChild(el('span', 'ic', typeof m.icon === 'string' && m.icon ? m.icon.slice(0, 8) : '✨'));
+    const t = el('div', 'tx');
+    if (typeof m.text === 'string' && m.text) t.appendChild(el('span', 'what', m.text.slice(0, 200)));
+    t.appendChild(el('span', 'res' + (emojiOnly(m.result) ? ' big' : ''), m.result.slice(0, 200)));
+    if (typeof m.sub === 'string' && m.sub) t.appendChild(el('span', 'sub', m.sub.slice(0, 200)));
+    f.appendChild(t); return f;
+  }
+  if (m.kind === 'me' && typeof m.text === 'string' && m.text) return el('div', 'emote', '✦ ' + nameOf(m.by) + ' ' + m.text.slice(0, 300));
   const text = typeof m.text === 'string' ? m.text : '';
   if (emojiOnly(text)) return el('div', 'big', text);
   const b = el('div', 'bubble'); fillText(b, text); return b;
@@ -447,15 +955,17 @@ function rowFor(m, first, last) {
   const fresh = S.loaded && !S.seen.has(m.id);
   const r = el('div', 'row ' + (mine ? 'me' : 'them') + (first ? ' first' : '') + (last ? ' last' : '') + (fresh ? ' pop' : ''));
   if (!mine) r.appendChild(last ? av(m.by) : el('span', 'spacer'));
-  const col = el('div', 'col');
+  const c = el('div', 'col');
   if (first) {
     const meta = el('div', 'meta');
     if (!mine) meta.appendChild(el('span', 'nm', nameOf(m.by)));
+    if (S.admins.has(m.by)) meta.appendChild(el('span', 'tag', 'Admin'));
     meta.appendChild(el('span', null, timeLabel(m.ts)));
-    col.appendChild(meta);
+    c.appendChild(meta);
   }
-  const b = bubbleFor(m);
-  if (canPost()) {
+  const isFile = m.kind === 'file' && validFile(m.file);
+  const b = isFile ? fileCard(m) : bubbleFor(m);
+  if (canPost() && !isFile) {
     b.setAttribute('role', 'button'); b.tabIndex = 0;
     b.setAttribute('aria-expanded', S.active === m.id ? 'true' : 'false');
     const toggle = (e) => {
@@ -465,7 +975,7 @@ function rowFor(m, first, last) {
     b.addEventListener('click', toggle);
     b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } });
   }
-  col.appendChild(b);
+  c.appendChild(b);
   if (S.active === m.id && canPost()) {
     const tray = el('div', 'tray');
     REACTS.forEach((em) => {
@@ -475,7 +985,7 @@ function rowFor(m, first, last) {
       rb.addEventListener('click', () => { S.active = null; toggleReaction(m, em); render(); });
       tray.appendChild(rb);
     });
-    if (mine) {
+    if (mine || S.isAdmin) {
       const del = el('button', 'del', S.pendingDelete === m.id ? 'Sure?' : 'Delete'); del.type = 'button';
       del.addEventListener('click', () => {
         if (S.pendingDelete === m.id) { S.active = null; S.pendingDelete = null; deleteMsg(m); render(); }
@@ -483,22 +993,22 @@ function rowFor(m, first, last) {
       });
       tray.appendChild(del);
     }
-    col.appendChild(tray);
+    c.appendChild(tray);
   }
   const chips = REACTS.filter((e) => reactionCount(m, e) > 0);
   if (chips.length) {
     const rx = el('div', 'rx');
     chips.forEach((e) => {
-      const c = el('button', 'chip'); c.type = 'button';
-      c.setAttribute('aria-pressed', reactedByMe(m, e) ? 'true' : 'false');
-      c.appendChild(document.createTextNode(e));
-      c.appendChild(el('span', 'c', String(reactionCount(m, e))));
-      if (canPost()) c.addEventListener('click', () => toggleReaction(m, e)); else c.disabled = true;
-      rx.appendChild(c);
+      const ch = el('button', 'chip'); ch.type = 'button';
+      ch.setAttribute('aria-pressed', reactedByMe(m, e) ? 'true' : 'false');
+      ch.appendChild(document.createTextNode(e));
+      ch.appendChild(el('span', 'c', String(reactionCount(m, e))));
+      if (canPost()) ch.addEventListener('click', () => toggleReaction(m, e)); else ch.disabled = true;
+      rx.appendChild(ch);
     });
-    col.appendChild(rx);
+    c.appendChild(rx);
   }
-  r.appendChild(col);
+  r.appendChild(c);
   return r;
 }
 
@@ -506,9 +1016,9 @@ function render() {
   const near = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
   const st = feed.scrollTop;
   const frag = document.createDocumentFragment();
-  if (!S.msgsReady) {
+  if (S.room && !S.msgsReady) {
     frag.appendChild(el('div', 'note', 'Connecting to the chat…'));
-  } else if (!S.msgs.length) {
+  } else if (!S.room || !S.msgs.length) {
     frag.appendChild(emptyState());
   } else {
     let prev = null;
@@ -535,29 +1045,38 @@ function render() {
 }
 
 /* ---------- header, typing, composer ---------- */
+// 'here'   = tab in front, viewing this room
+// 'online' = tab in front, viewing a different room
+// 'away'   = tab closed, or quikchat open in a background tab
+function statusOf(id) {
+  if (id === S.uid) return 'here';
+  const p = S.presence[id];
+  if (!p || p.vis !== true || !Number.isFinite(p.seen) || Date.now() - p.seen > ONLINE_MS) return 'away';
+  return p.view === S.room ? 'here' : 'online';
+}
 function onlineIds() {
-  const now = Date.now();
-  const ids = Object.keys(S.presence).filter((id) => {
-    const p = S.presence[id]; return p && Number.isFinite(p.seen) && now - p.seen < ONLINE_MS;
-  });
-  if (S.uid && !ids.includes(S.uid)) ids.unshift(S.uid);
+  if (!S.room) return [];
+  const ids = Object.keys(S.presence).filter((id) => id !== S.uid && S.members[id] && !S.banned[id] && statusOf(id) === 'here');
+  if (S.uid) ids.unshift(S.uid);
   return ids;
 }
 function renderHere() {
   const here = $('here'); here.replaceChildren();
-  const ids = S.uid ? onlineIds() : [];
+  const ids = (S.uid && S.room) ? onlineIds() : [];
   if (ids.length) {
     here.appendChild(el('span', 'dot'));
     const stack = el('span', 'stack');
     ids.slice(0, 4).forEach((id) => { const a = av(id); a.title = nameOf(id); stack.appendChild(a); });
     here.appendChild(stack);
     here.appendChild(el('span', 'label', ids.length === 1 ? 'Just you here' : ids.length + ' here now'));
-  } else {
+  } else if (S.room) {
     const n = Object.keys(S.members).length;
     if (n) here.appendChild(el('span', 'label', n + (n === 1 ? ' friend' : ' friends')));
   }
+  here.hidden = !here.childNodes.length;
   const mb = $('meBtn');
   if (hasProfile()) { mb.hidden = false; mb.replaceChildren(av(S.uid)); } else { mb.hidden = true; }
+  if (sheets.peopleSheet) renderPeople();
 }
 function renderTyping() {
   const t = $('typing'); t.replaceChildren();
@@ -575,17 +1094,15 @@ function renderTyping() {
 function syncComposer() {
   const ok = canPost();
   msg.disabled = !ok; sendBtn.disabled = !ok || !msg.value.trim();
-  if (S.blocked) msg.placeholder = 'Chat is blocked, see the note above';
-  else if (!S.db || !S.uid) msg.placeholder = 'Connecting…';
+  $('attachBtn').disabled = !ok;
+  if (!ok) closeCmdMenu();
+  if (!S.db || !S.uid) msg.placeholder = 'Connecting…';
+  else if (!S.room) msg.placeholder = 'Join a room to start chatting';
   else if (!hasProfile()) msg.placeholder = S.membersReady ? 'Pick a name to start chatting' : 'Connecting…';
-  else msg.placeholder = 'Message your friends… try /roll or /flip';
+  else msg.placeholder = 'Message ' + roomLabel(S.room) + '… type / for commands';
 }
 function autosize() { msg.style.height = 'auto'; msg.style.height = Math.min(msg.scrollHeight, 120) + 'px'; }
 
-function writePresence(patch) {
-  if (!S.db || !S.uid) return Promise.resolve();
-  return setDoc(ref('presence', S.uid), patch, { merge: true }).catch(() => {});
-}
 function onType() {
   if (!msg.value.trim()) { stopTyping(); return; }
   const now = Date.now();
@@ -600,10 +1117,191 @@ function stopTyping() {
   if (S.typingOn) { S.typingOn = false; writePresence({ typing: false, seen: Date.now() }); }
 }
 
+/* ---------- slash commands ---------- */
+const rnd = (n) => Math.floor(Math.random() * n);
+const pickOne = (a) => a[rnd(a.length)];
+const cap = (s, n) => String(s).slice(0, n);
+function hashN(s) { let h = 0; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 2654435761) >>> 0; h ^= h >>> 16; h = Math.imul(h, 2246822507) >>> 0; return (h ^ (h >>> 13)) >>> 0; }
+
+const BALL = ['It is certain.', 'Without a doubt.', 'Yes, definitely.', 'You may rely on it.', 'As I see it, yes.', 'Most likely.', 'Signs point to yes.', 'Reply hazy, try again.', 'Ask again later.', 'Better not tell you now.', 'Cannot predict now.', 'Concentrate and ask again.', "Don't count on it.", 'My reply is no.', 'My sources say no.', 'Outlook not so good.', 'Very doubtful.'];
+const RPS = { rock: ['🪨', 'Rock'], paper: ['📄', 'Paper'], scissors: ['✂️', 'Scissors'] };
+const RPS_BEATS = { rock: 'scissors', paper: 'rock', scissors: 'paper' };
+const REELS = ['🍒', '🍋', '🔔', '⭐', '💎', '7️⃣'];
+const RATE_LINES = ['Absolutely not.', 'Yikes.', 'Not great.', 'Meh.', 'Meh, but trying.', 'Perfectly average.', 'Decent.', 'Pretty good!', 'Really good!', 'Almost perfect!', 'Perfect. No notes.'];
+const JOKES = [
+  ["Why don't scientists trust atoms?", 'Because they make up everything.'],
+  ['What do you call a fake noodle?', 'An impasta.'],
+  ['Why did the scarecrow win an award?', 'He was outstanding in his field.'],
+  ["I'm reading a book about anti-gravity.", "It's impossible to put down."],
+  ["Why can't you give Elsa a balloon?", "She'll let it go."],
+  ['What do you call cheese that is not yours?', 'Nacho cheese.'],
+  ['Why did the bicycle fall over?', 'It was two-tired.'],
+  ['What do you call a bear with no teeth?', 'A gummy bear.'],
+  ['Why did the math book look sad?', 'It had too many problems.'],
+  ['What did the ocean say to the beach?', 'Nothing, it just waved.'],
+  ['How does a penguin build its house?', 'Igloos it together.'],
+  ["Why don't eggs tell jokes?", "They'd crack each other up."],
+  ['What do you call a sleeping bull?', 'A bulldozer.'],
+  ['What did one wall say to the other?', "I'll meet you at the corner."],
+  ['Why was the computer cold?', 'It left its Windows open.'],
+  ['Why did the cookie go to the doctor?', 'It felt crumby.']
+];
+const rpsKey = (s) => { s = s.toLowerCase(); return Object.keys(RPS).find((k) => k === s || (s.length === 1 && k[0] === s)); };
+const emote = (withX, none) => (a) => ({ kind: 'me', text: a ? withX.replace('{x}', cap(a, 40)) : none });
+const plain = (suffix) => (a) => ({ kind: 'text', text: (a ? a + ' ' : '') + suffix });
+
+/* name, icon, args (shown in the popup), desc, req = argument required, run(arg) -> message fields, or { error } / { local } */
+const COMMANDS = [
+  { name: 'roll', icon: '🎲', args: '[d20]', desc: 'Roll a die (default is a d6)', run(a) {
+    if (a && !/^d?\d{1,4}$/i.test(a)) return { error: 'Try /roll, /roll 20 or /roll d100.' };
+    const sides = Math.min(1000, Math.max(2, parseInt((a || '6').replace(/^d/i, ''), 10)));
+    return { kind: 'roll', sides, result: 1 + rnd(sides) };
+  } },
+  { name: 'flip', icon: '🪙', desc: 'Flip a coin', run() { return { kind: 'flip', result: Math.random() < 0.5 ? 'Heads' : 'Tails' }; } },
+  { name: 'dice', icon: '🎲', args: '[2d6]', desc: 'Roll several dice at once', run(a) {
+    const m = (a || '2d6').toLowerCase().match(/^(\d{1,2})?d(\d{1,4})$/);
+    if (!m) return { error: 'Try /dice 2d6 or /dice 4d20.' };
+    const n = Math.min(10, Math.max(1, parseInt(m[1] || '1', 10)));
+    const s = Math.min(1000, Math.max(2, parseInt(m[2], 10)));
+    const rolls = Array.from({ length: n }, () => 1 + rnd(s));
+    return { kind: 'fun', icon: '🎲', text: 'rolled ' + n + 'd' + s, result: String(rolls.reduce((x, y) => x + y, 0)), sub: n > 1 ? rolls.join(' + ') : '' };
+  } },
+  { name: '8ball', icon: '🎱', args: '[question]', desc: 'Ask the Magic 8-Ball a question', run(a) {
+    return { kind: 'fun', icon: '🎱', text: a ? 'asked the Magic 8-Ball: “' + cap(a, 120) + '”' : 'shook the Magic 8-Ball', result: pickOne(BALL) };
+  } },
+  { name: 'rps', icon: '✊', args: '[rock|paper|scissors]', desc: 'Play rock-paper-scissors against the house', run(a) {
+    const me = a ? rpsKey(a) : pickOne(Object.keys(RPS));
+    if (!me) return { error: 'Pick rock, paper or scissors, or leave it blank.' };
+    const them = pickOne(Object.keys(RPS));
+    const res = me === them ? 'Tie!' : RPS_BEATS[me] === them ? 'Win!' : 'Lose!';
+    return { kind: 'fun', icon: '✊', text: 'played rock-paper-scissors', result: res, sub: RPS[me].join(' ') + '  vs  ' + RPS[them].join(' ') };
+  } },
+  { name: 'pick', icon: '🎯', args: '<a, b, c>', req: true, desc: 'Let fate choose between your options', run(a) {
+    const raw = a.includes(',') ? a.split(',') : /\sor\s/i.test(a) ? a.split(/\s+or\s+/i) : a.split(/\s+/);
+    const opts = raw.map((s) => s.trim()).filter(Boolean).slice(0, 20);
+    if (opts.length < 2) return { error: 'Give me two or more options, like /pick pizza, tacos, sushi.' };
+    return { kind: 'fun', icon: '🎯', text: 'chose from ' + opts.length + ' options', result: cap(pickOne(opts), 80), sub: cap(opts.join(' · '), 160) };
+  } },
+  { name: 'rate', icon: '⭐', args: '<anything>', req: true, desc: 'Get a score out of 10 for anything', run(a) {
+    const n = rnd(11);
+    return { kind: 'fun', icon: '⭐', text: 'rated “' + cap(a, 80) + '”', result: n + '/10', sub: RATE_LINES[n] };
+  } },
+  { name: 'slots', icon: '🎰', desc: 'Pull the lever on the slot machine', run() {
+    const r = [0, 0, 0].map(() => pickOne(REELS));
+    const kinds = new Set(r).size;
+    return { kind: 'fun', icon: '🎰', text: 'pulled the slot machine', result: r.join(' '), sub: kinds === 1 ? 'JACKPOT! 🎉' : kinds === 2 ? 'So close! Two of a kind.' : 'No luck. Spin again!' };
+  } },
+  { name: 'ship', icon: '💘', args: '<name> [name]', req: true, desc: 'Check how well two names match', run(a) {
+    let parts = /[&+,]|\band\b/i.test(a) ? a.split(/\s*(?:[&+,]|\band\b)\s*/i) : a.split(/\s+/);
+    parts = parts.map((s) => s.trim()).filter(Boolean);
+    if (parts.length === 1) parts.unshift(nameOf(S.uid));
+    if (parts.length !== 2) return { error: 'Try /ship Alex Sam or /ship Alex & Sam.' };
+    const [x, y] = parts.map((s) => cap(s, 24));
+    const pct = hashN([x, y].map((s) => s.toLowerCase()).sort().join('|')) % 101;
+    const hearts = Math.round(pct / 20);
+    const verdict = pct >= 90 ? 'Soulmates! 💍' : pct >= 70 ? 'Great match!' : pct >= 50 ? 'Worth a shot.' : pct >= 30 ? 'Just friends?' : 'Yikes… 😬';
+    return { kind: 'fun', icon: '💘', text: x + ' + ' + y, result: pct + '%', sub: '❤️'.repeat(hearts) + '🤍'.repeat(5 - hearts) + '  ' + verdict };
+  } },
+  { name: 'joke', icon: '😂', desc: 'Tell a random corny joke', run() {
+    const j = pickOne(JOKES);
+    return { kind: 'fun', icon: '😂', text: j[0], result: j[1] };
+  } },
+  { name: 'me', icon: '🎭', args: '<action>', req: true, desc: 'Describe what you are doing', run(a) { return { kind: 'me', text: cap(a, 300) }; } },
+  { name: 'hug', icon: '🤗', args: '[name]', desc: 'Give someone a big hug', run: emote('gives {x} a big hug 🤗', 'gives everyone a big hug 🤗') },
+  { name: 'highfive', icon: '🙌', args: '[name]', desc: 'Leave someone hanging, or not', run: emote('high-fives {x} 🙌', 'high-fives the whole room 🙌') },
+  { name: 'boop', icon: '👉', args: '[name]', desc: 'Boop someone on the nose', run: emote('boops {x} on the nose 👉👃', 'boops the air 👉') },
+  { name: 'dance', icon: '💃', desc: 'Bust out some moves', run() { return { kind: 'me', text: 'busts out some moves 💃🕺' }; } },
+  { name: 'shrug', icon: '🤷', args: '[message]', desc: 'Add a shrug to your message', run: plain('¯\\_(ツ)_/¯') },
+  { name: 'tableflip', icon: '😤', args: '[message]', desc: 'Flip the table in frustration', run: plain('(╯°□°)╯︵ ┻━┻') },
+  { name: 'unflip', icon: '😌', args: '[message]', desc: 'Put the table back and calm down', run: plain('┬─┬ ノ( ゞ°ノ)') },
+  { name: 'lenny', icon: '😏', args: '[message]', desc: 'Add a lenny face to your message', run: plain('( \u0361° \u035cʖ \u0361°)') },
+  { name: 'clap', icon: '👏', args: '<message>', req: true, desc: 'Put 👏 a 👏 clap 👏 between 👏 words', run(a) { return { kind: 'text', text: a.split(/\s+/).join(' 👏 ') + ' 👏' }; } },
+  { name: 'mock', icon: '🧽', args: '<message>', req: true, desc: 'sPoNgEbOb mOcKiNg cAsE', run(a) { let i = 0; return { kind: 'text', text: a.replace(/[a-z]/gi, (c) => (i++ % 2 ? c.toUpperCase() : c.toLowerCase())) }; } },
+  { name: 'yell', icon: '📢', args: '<message>', req: true, desc: 'SAY IT LOUDER', run(a) { return { kind: 'text', text: '📢 ' + a.toUpperCase() + '!!' }; } },
+  { name: 'help', icon: '❓', desc: 'Show every command', run() {
+    return { local() { msg.value = '/'; autosize(); syncComposer(); updateCmdMenu(); msg.focus(); } };
+  } }
+];
+
+function parseCommand(text) {
+  const m = text.match(/^\/([a-z0-9_-]+)(?:\s+([\s\S]*))?$/i);
+  if (!m) return null;
+  const name = m[1].toLowerCase();
+  return { name, cmd: COMMANDS.find((c) => c.name === name) || null, arg: (m[2] || '').trim() };
+}
+
+/* ---------- command popup (type "/" in the composer) ---------- */
+const cmdMenu = $('cmdMenu');
+const CM = { open: false, items: [], sel: 0, hint: false, q: null, dismissed: false };
+function cmdMatches(q) {
+  if (!q) return COMMANDS.slice();
+  const starts = COMMANDS.filter((c) => c.name.startsWith(q));
+  const rest = COMMANDS.filter((c) => !c.name.startsWith(q) && (c.name.includes(q) || (q.length >= 3 && c.desc.toLowerCase().includes(q))));
+  return starts.concat(rest);
+}
+function closeCmdMenu() {
+  CM.open = false; CM.q = null; CM.hint = false;
+  cmdMenu.hidden = true; cmdMenu.replaceChildren();
+  msg.removeAttribute('aria-activedescendant'); msg.removeAttribute('aria-controls');
+}
+function setCmdSel(i) {
+  CM.sel = i;
+  cmdMenu.querySelectorAll('.cm-item').forEach((n, j) => n.setAttribute('aria-selected', j === i ? 'true' : 'false'));
+  msg.setAttribute('aria-activedescendant', 'cmd-' + CM.items[i].name);
+  const n = cmdMenu.querySelectorAll('.cm-item')[i]; if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest' });
+}
+function pickCmd(c) {
+  msg.value = '/' + c.name + (c.args ? ' ' : '');
+  CM.dismissed = !c.args;   // nothing left to type, so keep the popup closed
+  autosize(); syncComposer(); onType(); updateCmdMenu(); msg.focus();
+  msg.setSelectionRange(msg.value.length, msg.value.length);
+}
+function renderCmdMenu() {
+  cmdMenu.replaceChildren(); cmdMenu.hidden = false;
+  cmdMenu.appendChild(el('div', 'cm-head', CM.hint ? 'Usage' : CM.q ? 'Commands matching /' + CM.q : 'Commands'));
+  const list = el('div', 'cm-list'); list.id = 'cmdList'; list.setAttribute('role', 'listbox'); list.setAttribute('aria-label', 'Commands');
+  CM.items.forEach((c, i) => {
+    const it = el('div', 'cm-item'); it.id = 'cmd-' + c.name; it.setAttribute('role', 'option');
+    it.setAttribute('aria-selected', !CM.hint && i === CM.sel ? 'true' : 'false');
+    const ic = el('span', 'cm-ic', c.icon); ic.setAttribute('aria-hidden', 'true');
+    const tx = el('span', 'cm-tx');
+    const nm = el('span', 'cm-name', '/' + c.name);
+    if (c.args) nm.appendChild(el('span', 'cm-args', c.args));
+    tx.append(nm, el('span', 'cm-desc', c.desc));
+    it.append(ic, tx);
+    if (!CM.hint) {
+      it.addEventListener('mousemove', () => { if (CM.sel !== i) setCmdSel(i); });
+      it.addEventListener('click', () => pickCmd(c));
+    }
+    list.appendChild(it);
+  });
+  cmdMenu.appendChild(list);
+  msg.setAttribute('aria-controls', 'cmdList');
+  if (!CM.hint) setCmdSel(CM.sel); else msg.removeAttribute('aria-activedescendant');
+}
+function updateCmdMenu() {
+  if (!canPost() || CM.dismissed) { closeCmdMenu(); return; }
+  const v = msg.value;
+  let items = [], hint = false, q = null;
+  const m = v.match(/^\/([a-z0-9_-]*)$/i);
+  if (m) { q = m[1].toLowerCase(); items = cmdMatches(q); }
+  else {
+    const h = v.match(/^\/([a-z0-9_-]+)\s/i);
+    const c = h && COMMANDS.find((x) => x.name === h[1].toLowerCase());
+    if (c && c.args) { items = [c]; hint = true; }
+  }
+  if (!items.length) { closeCmdMenu(); return; }
+  if (q !== CM.q || hint !== CM.hint) CM.sel = 0;
+  CM.q = q; CM.hint = hint; CM.items = items; CM.open = true;
+  CM.sel = Math.min(CM.sel, items.length - 1);
+  renderCmdMenu();
+}
+cmdMenu.addEventListener('mousedown', (e) => e.preventDefault());   // keep focus in the textbox
+
 /* ---------- writes ---------- */
 function explain(e) {
   const code = e && e.code ? String(e.code) : '';
-  if (code.includes('permission-denied')) return 'Firebase refused the request. Check that the Firestore rules at the top of this file are published.';
+  if (code.includes('permission-denied')) return 'Firebase refused the request. Check that the latest Firestore rules from the RULES section of this file are published.';
   if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') return 'Turn on Anonymous sign-in in Firebase Authentication, then reload.';
   if (code.includes('api-key') || code === 'auth/invalid-api-key') return 'The Firebase API key looks wrong. Check the config you pasted.';
   if (code.includes('failed-precondition') || code.includes('not-found')) return 'Firestore isn’t set up for this project yet. Create the database in the Firebase console.';
@@ -619,18 +1317,21 @@ function writeError(e, ctx, restore) {
 async function send() {
   const text = msg.value.trim();
   if (!text || !canPost()) return;
-  const doc_ = { by: S.uid, ts: serverTimestamp(), reactions: {} };
-  const cmd = text.match(/^\/(roll|flip)(?:\s+d?(\d{1,4}))?$/i);
-  if (cmd && cmd[1].toLowerCase() === 'flip') {
-    doc_.kind = 'flip'; doc_.result = Math.random() < 0.5 ? 'Heads' : 'Tails';
-  } else if (cmd) {
-    const sides = Math.min(1000, Math.max(2, parseInt(cmd[2] || '6', 10)));
-    doc_.kind = 'roll'; doc_.sides = sides; doc_.result = 1 + Math.floor(Math.random() * sides);
+  const payload = { by: S.uid, ts: serverTimestamp(), reactions: {} };
+  const cm = parseCommand(text);
+  if (cm) {
+    if (!cm.cmd) { toast('Unknown command /' + cm.name + '. Type / to see them all.'); return; }
+    if (cm.cmd.req && !cm.arg) { toast('Usage: /' + cm.cmd.name + ' ' + cm.cmd.args); return; }
+    const out = cm.cmd.run(cm.arg);
+    if (out.error) { toast(out.error); return; }
+    if (out.local) { out.local(); return; }
+    Object.assign(payload, out);
+    if (payload.kind === 'text') payload.text = cap(payload.text, 1000);
   } else {
-    doc_.kind = 'text'; doc_.text = text.slice(0, 1000);
+    payload.kind = 'text'; payload.text = text.slice(0, 1000);
   }
-  msg.value = ''; autosize(); stopTyping(); syncComposer(); S.stick = true; S.active = null;
-  try { await addDoc(col('messages'), doc_); }
+  msg.value = ''; autosize(); stopTyping(); syncComposer(); updateCmdMenu(); S.stick = true; S.active = null;
+  try { await addDoc(col('messages'), payload); }
   catch (e) { writeError(e, 'send', text); }
 }
 let rxChain = Promise.resolve();
@@ -641,7 +1342,15 @@ function toggleReaction(m, emoji) {
     .catch((e) => writeError(e, 'react'));
 }
 function deleteMsg(m) {
-  deleteDoc(ref('messages', m.id)).catch(() => toast('Couldn’t delete that message.'));
+  const room = S.room;
+  deleteDoc(ref('messages', m.id)).then(() => {
+    if (m.kind === 'file' && validFile(m.file)) {
+      S.fileCache.delete(m.file.id);
+      for (let i = 0; i < m.file.chunks; i++) {
+        deleteDoc(doc(S.db, 'rooms', room, 'filechunks', m.file.id + '_' + i)).catch(() => {});
+      }
+    }
+  }).catch(() => toast('Couldn’t delete that message.'));
 }
 
 /* ---------- profile sheet ---------- */
@@ -667,7 +1376,7 @@ function renderPicks() {
   const a = el('span', 'av', D.face); a.style.background = 'var(--p' + D.color + ')'; a.setAttribute('aria-hidden', 'true');
   pv.appendChild(a); pv.appendChild(el('span', 't', $('nick').value.trim() || 'Your name'));
 }
-function openSheet(editing) {
+function openProfile(editing) {
   const m = member(S.uid);
   S.editing = editing;
   D.nick = (m && typeof m.nick === 'string' && m.nick) || '';
@@ -678,54 +1387,512 @@ function openSheet(editing) {
   $('ph').textContent = editing ? 'Your look' : 'Welcome to quikchat';
   $('save').textContent = editing ? 'Save' : 'Join the chat';
   renderPicks();
-  $('sheet').hidden = false;
-  $('nick').focus();
+  $('myId').textContent = S.uid || '';
+  $('admText').textContent = S.isAdmin
+    ? 'You’re an admin. You can remove people from rooms, let them back in, and delete any message.'
+    : 'Owner setup: in the Firebase console, open Firestore Database, start a collection named admins, and add a document whose ID is the ID below. Then reload this page.';
+  showSheet('sheet', 'nick', editing ? () => hideSheet('sheet') : null);
 }
-function closeSheet() { $('sheet').hidden = true; (hasProfile() ? msg : $('meBtn')).focus(); }
 $('nick').addEventListener('input', renderPicks);
-$('cancel').addEventListener('click', closeSheet);
+$('cancel').addEventListener('click', () => hideSheet('sheet'));
 $('profile').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nick = $('nick').value.trim().slice(0, 20);
   if (!nick) { $('nick').focus(); toast('Add a name first.'); return; }
-  if (!S.db || !S.uid) return;
+  if (nick.toLowerCase().replace(/\s+/g, '') === 'scuba' && !S.isAdmin) { $('nick').focus(); toast('That name is reserved. Pick another one.'); return; }
+  if (!S.db || !S.uid || !S.room) return;
+  const prof = { nick, face: D.face, color: D.color };
   try {
-    await setDoc(ref('members', S.uid), { nick, face: D.face, color: D.color });
-    closeSheet();
+    await setDoc(ref('members', S.uid), prof);
+    LS.set('quikchat.profile', JSON.stringify(prof));
+    // keep the same name and look in every other room you've joined
+    S.rooms.forEach((r) => {
+      if (r.code !== S.room) setDoc(doc(S.db, 'rooms', r.code, 'members', S.uid), prof).catch(() => {});
+    });
+    hideSheet('sheet', false);
+    (hasProfile() ? msg : $('meBtn')).focus();
   } catch (err) {
     toast('Couldn’t save. Try again.');
     const why = explain(err); if (why) banner(why);
   }
 });
-$('sheet').addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && S.editing) { closeSheet(); return; }
-  if (e.key !== 'Tab') return;
-  const f = [...$('profile').querySelectorAll('button, input')].filter((n) => !n.hidden && !n.disabled);
-  if (!f.length) return;
-  const first = f[0], last = f[f.length - 1];
-  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+$('meBtn').addEventListener('click', () => openProfile(true));
+
+/* ---------- join room ---------- */
+function openJoin() {
+  $('roomCode').value = '';
+  $('roomCancel').hidden = !S.rooms.length;
+  showSheet('roomSheet', 'roomCode', S.rooms.length ? () => hideSheet('roomSheet') : null);
+}
+$('joinBtn').addEventListener('click', openJoin);
+$('roomCancel').addEventListener('click', () => hideSheet('roomSheet'));
+$('roomRandom').addEventListener('click', () => { const i = $('roomCode'); i.value = randomRoom(); i.focus(); i.select(); });
+$('roomForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  let r = $('roomCode').value.trim();
+  if (r.includes('#')) r = r.split('#').pop();
+  r = r.toLowerCase();
+  if (!validRoom(r)) { toast('Use 3 to 40 letters, numbers or dashes.'); $('roomCode').focus(); return; }
+  if (!S.db || !S.uid) { toast('Still connecting. Try again in a moment.'); return; }
+  if (!addRoom(r)) return;
+  hideSheet('roomSheet', false);
+  closeDrawer(false);
+  switchRoom(r);
+  msg.focus();
 });
-$('meBtn').addEventListener('click', () => openSheet(true));
+
+/* ---------- room settings ---------- */
+function openRoomInfo() {
+  if (!S.room) return;
+  S.pendingLeave = false;
+  $('leaveBtn').textContent = 'Leave room';
+  const named = S.info[S.room] && S.info[S.room].name;
+  $('roomNameInput').value = named || '';
+  $('roomNameInput').placeholder = S.room;
+  $('codeText').textContent = S.room;
+  showSheet('roomInfo', 'roomNameInput', () => hideSheet('roomInfo'));
+}
+$('roomBtn').addEventListener('click', openRoomInfo);
+$('roomInfoCancel').addEventListener('click', () => hideSheet('roomInfo'));
+$('copyInvite').addEventListener('click', async () => {
+  const base = location.href.split('#')[0];
+  const web = /^https?:/.test(location.protocol);
+  try { await copyText(web ? base + '#' + S.room : S.room); toast(web ? 'Invite link copied.' : 'Room code copied.'); }
+  catch (e) { toast('Room code: ' + S.room); }
+});
+$('roomInfoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = $('roomNameInput').value.trim().slice(0, 30);
+  const current = (S.info[S.room] && S.info[S.room].name) || '';
+  if (!name) { toast('Give the room a name.'); $('roomNameInput').focus(); return; }
+  if (name === current) { hideSheet('roomInfo'); return; }
+  try {
+    await setDoc(doc(S.db, 'rooms', S.room), { name }, { merge: true });
+    hideSheet('roomInfo');
+    toast('Room renamed.');
+  } catch (err) {
+    const why = explain(err);
+    toast('Couldn’t rename the room.');
+    if (why) banner(why);
+  }
+});
+$('leaveBtn').addEventListener('click', () => {
+  if (!S.pendingLeave) { S.pendingLeave = true; $('leaveBtn').textContent = 'Tap again to leave'; return; }
+  const code = S.room;
+  hideSheet('roomInfo', false);
+  if (S.db && S.uid) setDoc(doc(S.db, 'rooms', code, 'presence', S.uid), { vis: false, seen: Date.now(), typing: false }, { merge: true }).catch(() => {});
+  S.rooms = S.rooms.filter((r) => r.code !== code);
+  delete S.readTs[code]; saveRead(); saveRooms();
+  const nextCode = S.rooms.slice().sort((a, b) => {
+    const ta = (S.info[a.code] && S.info[a.code].last && S.info[a.code].last.ts) || a.at;
+    const tb = (S.info[b.code] && S.info[b.code].last && S.info[b.code].last.ts) || b.at;
+    return tb - ta;
+  })[0];
+  unsubscribeInfo(code);
+  toast('Left the room.');
+  if (nextCode) { switchRoom(nextCode.code); msg.focus(); }
+  else { noRoom(); openJoin(); }
+});
+
+/* ---------- people in this room ---------- */
+function ago(ts) {
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (s < 60) return 'just now';
+  const m = Math.round(s / 60);
+  if (m < 60) return m + ' min ago';
+  const h = Math.round(m / 60);
+  if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+  const d = Math.round(h / 24);
+  return d + (d === 1 ? ' day ago' : ' days ago');
+}
+function seenOf(id) { const p = S.presence[id]; return (p && Number.isFinite(p.seen)) ? p.seen : 0; }
+function personRow(id, status) {
+  const row = el('div', 'person' + (status === 'away' ? ' away' : ''));
+  const pav = el('span', 'pav'); pav.appendChild(av(id));
+  if (status !== 'away') {
+    const d = el('span', 'pdot' + (status === 'online' ? ' alt' : ''));
+    d.setAttribute('aria-hidden', 'true'); pav.appendChild(d);
+  }
+  const txt = el('span', 'ptxt');
+  const name = el('span', 'pname', nameOf(id));
+  if (id === S.uid) name.appendChild(el('span', 'you', ' (you)'));
+  if (S.admins.has(id)) name.appendChild(el('span', 'tag', 'Admin'));
+  const p = S.presence[id];
+  let sub;
+  if (status === 'here') {
+    const typing = id !== S.uid && p && p.typing === true && Number.isFinite(p.typingAt) && Date.now() - p.typingAt < TYPING_MS;
+    sub = typing ? 'Typing…' : 'Here now';
+  } else if (status === 'online') {
+    sub = 'Online';
+  } else {
+    const t = seenOf(id);
+    sub = t > 0 ? 'Away · last seen ' + ago(t) : 'Away';
+  }
+  txt.append(name, el('span', 'psub', sub));
+  row.append(pav, txt);
+  if (S.isAdmin && id !== S.uid && !S.admins.has(id)) {
+    const b = el('button', 'pbtn danger', S.pendingKick === id ? 'Sure?' : 'Remove'); b.type = 'button';
+    b.setAttribute('aria-label', 'Remove ' + nameOf(id) + ' from this room');
+    b.addEventListener('click', () => {
+      if (S.pendingKick === id) { S.pendingKick = null; kickUser(id); }
+      else { S.pendingKick = id; renderPeople(); }
+    });
+    row.appendChild(b);
+  }
+  return row;
+}
+async function kickUser(id) {
+  const room = S.room, who = nameOf(id);
+  try {
+    await setDoc(doc(S.db, 'rooms', room, 'banned', id), { by: S.uid, at: serverTimestamp(), nick: who, face: faceOf(id), color: colorIdx(id) });
+    toast(who + ' was removed from this room.');
+  } catch (e) {
+    toast('Couldn’t remove them. Make sure you’re set up as an admin and the latest rules are published.');
+    const why = explain(e); if (why) banner(why);
+  }
+}
+function unbanUser(id) {
+  deleteDoc(doc(S.db, 'rooms', S.room, 'banned', id)).then(() => toast('They can join this room again.'))
+    .catch(() => toast('Couldn’t let them back in.'));
+}
+function renderPeople() {
+  const list = $('peopleList'); list.replaceChildren();
+  if (!S.room) return;
+  const ids = new Set(Object.keys(S.members));
+  if (S.uid) ids.add(S.uid);
+  const groups = { here: [], online: [], away: [] };
+  ids.forEach((id) => { if (!S.banned[id]) groups[statusOf(id)].push(id); });
+  const byName = (a, b) => (a === S.uid ? -1 : b === S.uid ? 1 : nameOf(a).localeCompare(nameOf(b)));
+  groups.here.sort(byName); groups.online.sort(byName);
+  groups.away.sort((a, b) => seenOf(b) - seenOf(a));
+  $('pph').textContent = 'People in ' + roomLabel(S.room);
+  $('peopleSub').textContent = [
+    groups.here.length + ' here now',
+    groups.online.length ? groups.online.length + ' online' : '',
+    groups.away.length ? groups.away.length + ' away' : ''
+  ].filter(Boolean).join(', ') + (S.isAdmin ? ' · You’re an admin' : '');
+  [['Here now', 'here'], ['Online', 'online'], ['Away', 'away']].forEach(([title, key]) => {
+    if (!groups[key].length) return;
+    list.appendChild(el('div', 'lbl', title));
+    groups[key].forEach((id) => list.appendChild(personRow(id, key)));
+  });
+  const gone = Object.keys(S.banned);
+  if (S.isAdmin && gone.length) {
+    list.appendChild(el('div', 'lbl', 'Removed'));
+    gone.forEach((id) => {
+      const b = S.banned[id] || {};
+      const row = el('div', 'person away');
+      const pav = el('span', 'pav');
+      const a = el('span', 'av', FACES.includes(b.face) ? b.face : '🙂');
+      a.style.background = 'var(--p' + (Number.isInteger(b.color) && b.color >= 0 && b.color < 8 ? b.color : hashIdx(id)) + ')';
+      a.setAttribute('aria-hidden', 'true'); pav.appendChild(a);
+      const txt = el('span', 'ptxt');
+      txt.append(el('span', 'pname', typeof b.nick === 'string' && b.nick ? b.nick.slice(0, 20) : 'Someone'), el('span', 'psub', 'Removed'));
+      const btn = el('button', 'pbtn', 'Let back in'); btn.type = 'button';
+      btn.addEventListener('click', () => unbanUser(id));
+      row.append(pav, txt, btn); list.appendChild(row);
+    });
+  }
+}
+function openPeople() {
+  if (!S.room) return;
+  S.pendingKick = null;
+  renderPeople();
+  showSheet('peopleSheet', 'peopleClose', () => hideSheet('peopleSheet'));
+}
+$('here').addEventListener('click', openPeople);
+$('copyId').addEventListener('click', async () => {
+  try { await copyText(S.uid || ''); toast('ID copied.'); }
+  catch (e) { toast('Select the ID and copy it.'); }
+});
+$('peopleClose').addEventListener('click', () => hideSheet('peopleSheet'));
+
+/* ---------- file sharing ---------- */
+// Files are split into chunks and stored as documents, so no billing plan is needed.
+// Firestore documents max out near 1 MB, which is why the cap is small.
+const MAX_FILE = 5 * 1024 * 1024;
+const CHUNK = 750000;
+const IMG_TYPES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', bmp: 'image/bmp', svg: 'image/svg+xml' };
+const AUDIO_TYPES = { mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', m4a: 'audio/mp4', aac: 'audio/aac' };
+const VIDEO_TYPES = { mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime' };
+const TEXT_EXT = new Set(['txt', 'md', 'csv', 'tsv', 'json', 'xml', 'html', 'htm', 'css', 'js', 'mjs', 'ts', 'tsx', 'jsx', 'py', 'java', 'c', 'h', 'cpp', 'cs', 'go', 'rs', 'rb', 'php', 'sh', 'bat', 'sql', 'yml', 'yaml', 'toml', 'ini', 'log', 'kt', 'swift', 'lua']);
+
+function fmtSize(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+function fileKind(name) {
+  const dot = name.lastIndexOf('.');
+  const ext = dot >= 0 ? name.slice(dot + 1).toLowerCase() : '';
+  if (IMG_TYPES[ext]) return { kind: 'image', mime: IMG_TYPES[ext], label: 'Image', ext };
+  if (ext === 'pdf') return { kind: 'pdf', mime: 'application/pdf', label: 'PDF', ext };
+  if (AUDIO_TYPES[ext]) return { kind: 'audio', mime: AUDIO_TYPES[ext], label: 'Audio', ext };
+  if (VIDEO_TYPES[ext]) return { kind: 'video', mime: VIDEO_TYPES[ext], label: 'Video', ext };
+  if (TEXT_EXT.has(ext)) return { kind: 'text', mime: '', label: 'Text file', ext };
+  return { kind: 'other', mime: '', label: ext ? ext.toUpperCase() + ' file' : 'File', ext };
+}
+function extLabel(name) {
+  const i = name.lastIndexOf('.');
+  return (i >= 0 && i < name.length - 1 ? name.slice(i + 1) : 'file').slice(0, 4).toUpperCase();
+}
+function cleanName(n) { return String(n || 'file').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').trim().slice(0, 100) || 'file'; }
+function randId() {
+  const a = 'abcdefghjkmnpqrstuvwxyz23456789'; const b = new Uint32Array(16); crypto.getRandomValues(b);
+  let s = ''; b.forEach((n) => { s += a[n % a.length]; });
+  return s;
+}
+function validThumb(s) { return typeof s === 'string' && s.length < 90000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s); }
+function validFile(f) {
+  return !!f && typeof f === 'object' && typeof f.id === 'string' && /^[a-z0-9]{10,32}$/.test(f.id)
+    && typeof f.name === 'string' && f.name.length > 0 && f.name.length <= 120
+    && Number.isInteger(f.size) && f.size >= 1 && f.size <= MAX_FILE
+    && f.chunks === Math.ceil(f.size / CHUNK);
+}
+
+function fileCard(m) {
+  const f = m.file, info = fileKind(f.name);
+  const card = el('div', 'filecard');
+  const main = el('button', 'fc-main'); main.type = 'button';
+  main.setAttribute('aria-label', 'Preview ' + f.name);
+  if (info.kind === 'image' && validThumb(f.thumb)) {
+    const img = document.createElement('img');
+    img.className = 'fc-thumb'; img.alt = ''; img.src = f.thumb;
+    main.classList.add('hasthumb'); main.appendChild(img);
+  } else {
+    const ic = el('span', 'fc-ic', extLabel(f.name));
+    ic.style.background = 'var(--p' + hashIdx(info.ext || 'file') + ')';
+    ic.setAttribute('aria-hidden', 'true'); main.appendChild(ic);
+  }
+  const txt = el('span', 'fc-txt');
+  txt.appendChild(el('span', 'fc-name', f.name));
+  txt.appendChild(el('span', 'fc-meta', fmtSize(f.size) + ' · ' + info.label));
+  main.appendChild(txt);
+  main.addEventListener('click', () => openFilePreview(m));
+  card.appendChild(main);
+  if (canPost()) {
+    const more = el('button', 'fc-more'); more.type = 'button';
+    more.setAttribute('aria-label', 'Reactions and options');
+    more.setAttribute('aria-expanded', S.active === m.id ? 'true' : 'false');
+    more.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>';
+    more.addEventListener('click', () => { S.active = S.active === m.id ? null : m.id; S.pendingDelete = null; render(); });
+    card.appendChild(more);
+  }
+  return card;
+}
+
+function renderUploads() {
+  const box = $('uploads'); box.replaceChildren();
+  S.uploads.forEach((u) => {
+    const row = el('div', 'up');
+    row.appendChild(el('span', 'up-name', 'Sharing ' + u.name + '… ' + u.pct + '%'));
+    const bar = el('span', 'bar'); const fill = el('span', 'fill'); fill.style.width = u.pct + '%';
+    bar.appendChild(fill); row.appendChild(bar);
+    box.appendChild(row);
+  });
+  box.hidden = !S.uploads.length;
+}
+
+function loadImg(url) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+async function makeThumb(file, name) {
+  if (fileKind(name).kind !== 'image') return null;
+  let img;
+  try {
+    const url = URL.createObjectURL(file);
+    try { img = await loadImg(url); } finally { URL.revokeObjectURL(url); }
+  } catch (e) { return null; }
+  const w = img.naturalWidth || 300, h = img.naturalHeight || 300;
+  const tries = [[320, 0.72], [240, 0.6], [160, 0.5]];
+  for (const [max, q] of tries) {
+    const scale = Math.min(1, max / Math.max(w, h));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * scale)); c.height = Math.max(1, Math.round(h * scale));
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    try { ctx.drawImage(img, 0, 0, c.width, c.height); } catch (e) { return null; }
+    let d = '';
+    try { d = c.toDataURL('image/jpeg', q); } catch (e) { return null; }
+    if (d.length < 60000) return d;
+  }
+  return null;
+}
+
+async function sendFile(file, room) {
+  const name = cleanName(file.name);
+  const id = randId();
+  const n = Math.ceil(file.size / CHUNK);
+  const up = { id, name, pct: 0 };
+  S.uploads.push(up); renderUploads();
+  const written = [];
+  try {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const thumb = await makeThumb(file, name);
+    for (let i = 0; i < n; i++) {
+      const part = buf.subarray(i * CHUNK, Math.min(buf.length, (i + 1) * CHUNK));
+      await setDoc(doc(S.db, 'rooms', room, 'filechunks', id + '_' + i), { by: S.uid, fileId: id, i, data: Bytes.fromUint8Array(part) });
+      written.push(i);
+      up.pct = Math.round(((i + 1) / n) * 100); renderUploads();
+    }
+    const meta = { id, name, size: buf.length, mime: String(file.type || '').slice(0, 100), chunks: n };
+    if (thumb) meta.thumb = thumb;
+    await addDoc(collection(S.db, 'rooms', room, 'messages'), { by: S.uid, ts: serverTimestamp(), kind: 'file', reactions: {}, file: meta });
+    if (room === S.room) S.stick = true;
+  } catch (e) {
+    written.forEach((i) => deleteDoc(doc(S.db, 'rooms', room, 'filechunks', id + '_' + i)).catch(() => {}));
+    const why = explain(e);
+    toast('Couldn’t share ' + name + '.'); if (why) banner(why);
+  } finally {
+    S.uploads = S.uploads.filter((u) => u !== up); renderUploads();
+  }
+}
+
+let uploadChain = Promise.resolve();
+function handleFiles(list) {
+  const files = Array.from(list || []);
+  if (!files.length) return;
+  if (!canPost()) { toast('Join a room first.'); return; }
+  const room = S.room;
+  files.forEach((f) => {
+    if (!f.size) { toast(f.name + ' is empty.'); return; }
+    if (f.size > MAX_FILE) { toast(f.name + ' is over ' + fmtSize(MAX_FILE) + '. Pick a smaller file.'); return; }
+    uploadChain = uploadChain.then(() => sendFile(f, room)).catch(() => {});
+  });
+}
+
+async function loadFile(f, room) {
+  const hit = S.fileCache.get(f.id);
+  if (hit) return hit;
+  const snaps = await Promise.all(Array.from({ length: f.chunks }, (_, i) => getDoc(doc(S.db, 'rooms', room, 'filechunks', f.id + '_' + i))));
+  const out = new Uint8Array(f.size);
+  let off = 0;
+  for (const s of snaps) {
+    if (!s.exists()) throw new Error('missing');
+    const d = s.data();
+    const part = d && d.data && typeof d.data.toUint8Array === 'function' ? d.data.toUint8Array() : null;
+    if (!part || off + part.length > f.size) throw new Error('bad');
+    out.set(part, off); off += part.length;
+  }
+  if (off !== f.size) throw new Error('bad');
+  S.fileCache.set(f.id, out);
+  if (S.fileCache.size > 6) S.fileCache.delete(S.fileCache.keys().next().value);
+  return out;
+}
+
+function revokePv() { if (S.pv) S.pv.urls.forEach((u) => URL.revokeObjectURL(u)); }
+function blobUrl(u8, type) { const u = URL.createObjectURL(new Blob([u8], { type })); S.pv.urls.push(u); return u; }
+function renderPreviewBody(info, u8, f) {
+  const body = $('pvBody'); body.classList.remove('text'); body.replaceChildren(); $('pvNote').hidden = true;
+  const note = (t) => { $('pvNote').textContent = t; $('pvNote').hidden = false; };
+  if (info.kind === 'image') {
+    const img = document.createElement('img'); img.alt = f.name;
+    img.onerror = () => { body.replaceChildren(el('p', 'hint', 'Couldn’t show this image. Download it to open it.')); };
+    img.src = blobUrl(u8, info.mime); body.appendChild(img);
+  } else if (info.kind === 'pdf') {
+    const fr = document.createElement('iframe'); fr.title = f.name; fr.src = blobUrl(u8, 'application/pdf'); body.appendChild(fr);
+    note('If the PDF doesn’t show here, download it to open it.');
+  } else if (info.kind === 'audio' || info.kind === 'video') {
+    const media = document.createElement(info.kind); media.controls = true; media.preload = 'metadata';
+    media.src = blobUrl(u8, info.mime); body.appendChild(media);
+  } else if (info.kind === 'text') {
+    const CAP = 300000;
+    const text = new TextDecoder('utf-8').decode(u8.length > CAP ? u8.subarray(0, CAP) : u8);
+    body.classList.add('text');
+    body.appendChild(el('pre', null, text.slice(0, 200000)));
+    if (u8.length > CAP || text.length > 200000) note('Showing the beginning of the file. Download it to see everything.');
+  } else {
+    const g = el('div', 'pv-generic');
+    const ic = el('span', 'fc-ic', extLabel(f.name)); ic.style.background = 'var(--p' + hashIdx(info.ext || 'file') + ')';
+    g.append(ic, el('strong', null, f.name), el('span', 'hint', 'There’s no preview for this kind of file. Download it to open it.'));
+    body.appendChild(g);
+  }
+}
+async function openFilePreview(m) {
+  if (!S.db || !S.room) return;
+  const f = m.file, info = fileKind(f.name);
+  const token = ++S.pvToken;
+  revokePv();
+  S.pv = { m, u8: null, urls: [] };
+  $('pvt').textContent = f.name;
+  $('pvMeta').textContent = fmtSize(f.size) + ' · ' + info.label + ' · shared by ' + nameOf(m.by);
+  $('pvBody').classList.remove('text'); $('pvBody').replaceChildren(el('p', 'hint', 'Loading…'));
+  $('pvNote').hidden = true; $('pvDownload').disabled = true;
+  if (!sheets.previewSheet) showSheet('previewSheet', 'pvClose', () => closePreview());
+  try {
+    const u8 = await loadFile(f, S.room);
+    if (token !== S.pvToken || !sheets.previewSheet) return;
+    S.pv.u8 = u8;
+    renderPreviewBody(info, u8, f);
+    $('pvDownload').disabled = false;
+  } catch (e) {
+    if (token !== S.pvToken || !sheets.previewSheet) return;
+    const msgText = e && e.message === 'missing' ? 'This file is no longer available.'
+      : e && e.message === 'bad' ? 'This file looks damaged. Ask the sender to share it again.'
+      : 'Couldn’t load the file. Check your connection and try again.';
+    $('pvBody').replaceChildren(el('p', 'hint', msgText));
+    const why = explain(e); if (why) banner(why);
+  }
+}
+function closePreview(restore = true) {
+  S.pvToken++; revokePv(); S.pv = null;
+  $('pvBody').replaceChildren();
+  hideSheet('previewSheet', restore);
+}
+function downloadCurrent() {
+  if (!S.pv || !S.pv.u8) return;
+  const f = S.pv.m.file, info = fileKind(f.name);
+  const url = URL.createObjectURL(new Blob([S.pv.u8], { type: info.mime || 'application/octet-stream' }));
+  const a = document.createElement('a'); a.href = url; a.download = f.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+  toast('Downloading ' + f.name);
+}
+$('pvClose').addEventListener('click', () => closePreview());
+$('pvDownload').addEventListener('click', downloadCurrent);
+
+$('attachBtn').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', (e) => { handleFiles(e.target.files); e.target.value = ''; });
+msg.addEventListener('paste', (e) => {
+  const files = e.clipboardData && e.clipboardData.files;
+  if (files && files.length) { e.preventDefault(); handleFiles(files); }
+});
+let dragDepth = 0;
+const dragHasFiles = (e) => !!(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files'));
+addEventListener('dragenter', (e) => { if (!dragHasFiles(e)) return; e.preventDefault(); dragDepth++; if (canPost() && !anySheetOpen()) $('dropHint').hidden = false; });
+addEventListener('dragover', (e) => { if (dragHasFiles(e)) e.preventDefault(); });
+addEventListener('dragleave', (e) => { if (!dragHasFiles(e)) return; dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $('dropHint').hidden = true; });
+addEventListener('drop', (e) => {
+  if (!dragHasFiles(e)) return;
+  e.preventDefault(); dragDepth = 0; $('dropHint').hidden = true;
+  if (!anySheetOpen()) handleFiles(e.dataTransfer.files);
+});
 
 /* ---------- wiring ---------- */
 $('composer').addEventListener('submit', (e) => { e.preventDefault(); send(); });
-msg.addEventListener('input', () => { autosize(); syncComposer(); onType(); });
+msg.addEventListener('input', () => { CM.dismissed = false; autosize(); syncComposer(); onType(); updateCmdMenu(); });
 msg.addEventListener('keydown', (e) => {
+  if (CM.open && !CM.hint && !e.isComposing) {
+    const n = CM.items.length, c = CM.items[CM.sel];
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); setCmdSel((CM.sel + (e.key === 'ArrowDown' ? 1 : n - 1)) % n); return; }
+    if (e.key === 'Escape') { e.preventDefault(); CM.dismissed = true; closeCmdMenu(); return; }
+    if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); pickCmd(c); return; }
+    const exact = msg.value.trim().toLowerCase() === '/' + c.name;
+    if (e.key === 'Enter' && !e.shiftKey && !(exact && !c.req)) { e.preventDefault(); pickCmd(c); return; }
+  }
   if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
 });
-msg.addEventListener('blur', stopTyping);
+msg.addEventListener('focus', () => updateCmdMenu());
+msg.addEventListener('blur', () => { stopTyping(); closeCmdMenu(); });
 $('jump').addEventListener('click', () => { feed.scrollTop = feed.scrollHeight; $('jump').hidden = true; });
 feed.addEventListener('scroll', () => {
   if (feed.scrollHeight - feed.scrollTop - feed.clientHeight < 60) $('jump').hidden = true;
 });
-$('invite').addEventListener('click', async () => {
-  const url = location.href.split('#')[0] + '#' + S.room;
-  try { await copyText(url); toast('Invite link copied. Room code: ' + S.room); }
-  catch (e) { toast('Room code: ' + S.room); }
+window.addEventListener('hashchange', () => {
+  const r = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
+  if (!validRoom(r) || r === S.room || !S.db || !S.uid) return;
+  if (addRoom(r)) switchRoom(r);
 });
 
-/* ---------- config + room ---------- */
+/* ---------- config ---------- */
 function parseConfig(text) {
   const out = {}; const re = /["']?(\w+)["']?\s*:\s*["']([^"']*)["']/g; let m;
   while ((m = re.exec(text))) out[m[1]] = m[2];
@@ -733,13 +1900,13 @@ function parseConfig(text) {
 }
 function loadConfig() {
   if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.appId) return FIREBASE_CONFIG;
-  try { const saved = JSON.parse(localStorage.getItem('stoop.cfg') || 'null'); if (saved && saved.apiKey && saved.projectId && saved.appId) return saved; } catch (e) {}
+  const saved = LS.json('stoop.cfg', null);
+  if (saved && saved.apiKey && saved.projectId && saved.appId) return saved;
   return null;
 }
 function showSetup() {
   $('rulesText').textContent = RULES;
-  $('setup').hidden = false;
-  $('cfg').focus();
+  showSheet('setup', 'cfg', null);
   msg.placeholder = 'Connect Firebase to start';
 }
 $('copyRules').addEventListener('click', async () => {
@@ -754,58 +1921,34 @@ $('setupForm').addEventListener('submit', (e) => {
   location.reload();
 });
 
-function validRoom(r) { return /^[a-z0-9][a-z0-9-]{2,39}$/.test(r); }
-function randomRoom() {
-  const a = 'abcdefghjkmnpqrstuvwxyz23456789'; let s = 'quik-';
-  const buf = new Uint32Array(6); crypto.getRandomValues(buf);
-  buf.forEach((n) => { s += a[n % a.length]; });
-  return s;
-}
-function askRoom() {
-  return new Promise((resolve) => {
-    const input = $('roomCode');
-    input.value = randomRoom();
-    $('roomSheet').hidden = false; input.focus(); input.select();
-    $('roomForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const r = input.value.trim().toLowerCase();
-      if (!validRoom(r)) { toast('Use 3 to 40 letters, numbers or dashes.'); return; }
-      $('roomSheet').hidden = true; resolve(r);
-    });
-  });
-}
-async function pickRoom() {
-  let r = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
-  if (!validRoom(r)) { try { r = localStorage.getItem('stoop.room') || ''; } catch (e) { r = ''; } }
-  if (!validRoom(r)) r = await askRoom();
-  try { localStorage.setItem('stoop.room', r); } catch (e) {}
-  history.replaceState(null, '', location.href.split('#')[0] + '#' + r);
-  return r;
-}
-window.addEventListener('hashchange', () => {
-  const r = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
-  if (validRoom(r) && r !== S.room) { try { localStorage.setItem('stoop.room', r); } catch (e) {} location.reload(); }
-});
-
 function onSubErr(e) {
   S.msgsReady = true;
-  const why = explain(e);
-  banner(why || 'Lost the connection to the chat. Reload the page to reconnect.');
+  if (!S.bannedSelf) {
+    const why = explain(e);
+    banner(why || 'Lost the connection to the chat. Reload the page to reconnect.');
+  }
   syncComposer(); render();
 }
 
 /* ---------- start ---------- */
+function loadRooms() {
+  let list = LS.json('quikchat.rooms', []);
+  list = Array.isArray(list) ? list.filter((x) => x && validRoom(x.code)) : [];
+  const old = LS.get('stoop.room');
+  if (!list.length && validRoom(old)) list.push({ code: old, at: Date.now() });
+  const seen = new Set();
+  return list.filter((x) => (seen.has(x.code) ? false : (seen.add(x.code), true))).slice(0, MAX_ROOMS);
+}
+
 async function init() {
-  render(); syncComposer();
+  S.rooms = loadRooms();
+  render(); syncComposer(); renderRooms();
   const cfg = loadConfig();
   if (!cfg) { S.msgsReady = true; render(); showSetup(); return; }
-  S.room = await pickRoom();
-  $('roomTag').textContent = S.room; $('roomTag').hidden = false; $('invite').hidden = false;
 
-  let app, auth;
   try {
-    app = initializeApp(cfg);
-    auth = getAuth(app);
+    const app = initializeApp(cfg);
+    const auth = getAuth(app);
     S.db = getFirestore(app);
     const cred = await signInAnonymously(auth);
     S.uid = cred.user.uid;
@@ -815,35 +1958,43 @@ async function init() {
     syncComposer(); render(); return;
   }
 
-  onSnapshot(col('members'), (snap) => {
-    const m = {};
-    snap.forEach((d) => { m[d.id] = d.data(); });
-    S.members = m; S.membersReady = true;
-    if (S.uid && !m[S.uid] && !S.askedProfile) { S.askedProfile = true; openSheet(false); }
-    renderHere(); renderTyping(); syncComposer(); render();
-  }, onSubErr);
-
-  onSnapshot(query(col('messages'), orderBy('ts', 'desc'), limit(300)), (snap) => {
-    S.msgs = snap.docs.map((d) => {
-      const v = d.data({ serverTimestamps: 'estimate' });
-      const ts = v.ts && typeof v.ts.toMillis === 'function' ? v.ts.toMillis() : Date.now();
-      return { id: d.id, by: v.by, ts, kind: v.kind, text: v.text, result: v.result, sides: v.sides, reactions: v.reactions || {} };
-    }).reverse();
-    S.msgsReady = true; syncComposer(); render();
-  }, onSubErr);
-
-  onSnapshot(col('presence'), (snap) => {
-    const p = {};
-    snap.forEach((d) => { p[d.id] = d.data(); });
-    S.presence = p; renderHere(); renderTyping();
+  // rooms from the link, then the ones this browser already has
+  const fromHash = decodeURIComponent((location.hash || '').slice(1)).toLowerCase();
+  if (validRoom(fromHash)) addRoom(fromHash);
+  S.rooms.forEach((r) => subscribeInfo(r.code));
+  onSnapshot(collection(S.db, 'admins'), (snap) => {
+    S.admins = new Set(snap.docs.map((d) => d.id));
+    S.isAdmin = !!(S.uid && S.admins.has(S.uid));
+    syncComposer(); render();
+    if (sheets.peopleSheet) renderPeople();
   }, () => {});
+  saveRooms();
 
-  const beat = () => writePresence({ seen: Date.now() });
-  beat(); setInterval(beat, 20000);
+  const last = LS.get('quikchat.last');
+  let target = null;
+  if (validRoom(fromHash)) target = fromHash;
+  else if (validRoom(last) && S.rooms.some((r) => r.code === last)) target = last;
+  else if (S.rooms.length) target = S.rooms[0].code;
+
+  if (target) { switchRoom(target); }
+  else { noRoom(); openJoin(); }
+
+  // the room on screen gets a heartbeat every 20s, your other rooms every 60s
+  let tick = 0;
+  const beat = () => {
+    if (document.hidden) return;
+    tick++;
+    if (tick % 3 === 1) beatAll();
+    else writePresence({ vis: true, seen: Date.now(), view: S.room || null });
+  };
+  setInterval(beat, 20000);
   setInterval(() => { renderHere(); renderTyping(); }, 3000);
-  addEventListener('pagehide', () => { writePresence({ seen: 0, typing: false }); });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(); });
-  renderHere();
+  addEventListener('pagehide', () => { writeAllPresence({ vis: false, seen: Date.now(), typing: false }); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { writeAllPresence({ vis: false, seen: Date.now(), typing: false }); return; }
+    beatAll();
+    if (S.room) { const latest = S.msgs.length ? S.msgs[S.msgs.length - 1].ts : 0; markRead(S.room, latest); renderRooms(); }
+  });
 }
 init();
 </script>
